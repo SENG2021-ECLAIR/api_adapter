@@ -1,8 +1,8 @@
 from flask import Flask
 
-app = Flask(__name__)
+APP = Flask(__name__)
 
 
-@app.route('/')
-def main():
-    return 'Hello, World!'
+@APP.route("/")
+def default():
+    return "Hello, World!"
