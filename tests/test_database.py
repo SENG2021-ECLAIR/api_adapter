@@ -14,6 +14,11 @@ test_user_data = {
 }
 
 
+def cleanup(db, email):
+    users = db["users"]
+    users.delete_one({"email": email})
+
+
 @pytest.fixture
 def db():
     return connect_to_db()
@@ -25,11 +30,10 @@ def test_get_user(db):
     """
     create_user(test_user_data)
     user = get_user(test_user_data["email"])
+
     assert user["email"] == test_user_data["email"]
     assert user["password"] == "somepassword"
-    import pdb
 
-    pdb.set_trace()
     cleanup(db, test_user_data["email"])
 
 
@@ -58,9 +62,4 @@ def test_create_user(db):
 
     assert response == "user already registered"
 
-    users.delete_one(query)
-
-
-def cleanup(db, email):
-    users = db["users"]
-    users.delete_one({"email": email})
+    cleanup(db, test_user_data["email"])
