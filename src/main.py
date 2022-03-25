@@ -1,6 +1,6 @@
-from src.server import app
+from server import APP
 
 # Globals
 
 if __name__ == "__main__":
-    app.run()
+    APP.run()
