@@ -80,6 +80,23 @@ def test_login_user(db):
     assert logged_in_user["email"] == test_user_data["email"]
 
 
+def test_login_user_wrong_password(db):
+    users = db["users"]
+    logged_in = db["logged_in"]
+    query = {"email": test_user_data["email"]}
+    cleanup(db, test_user_data["email"])
+    _ = register_user(test_user_data)
+
+    assert users.find_one(query) is not None
+    assert logged_in.find_one(query) is None
+
+    token = login_user(test_user_data["email"], "incorrect password")
+
+    assert token is None
+    assert logged_in.find_one(query) is None
+    cleanup(db, test_user_data["email"])
+
+
 def test_login_user_not_registered(db):
     users = db["users"]
     logged_in = db["logged_in"]
@@ -90,6 +107,7 @@ def test_login_user_not_registered(db):
 
     assert token is None
     assert logged_in.find_one(query) is None
+    cleanup(db, test_user_data["email"])
 
 
 def test_login_user_already_logged_in(db):
@@ -118,6 +136,7 @@ def test_login_user_already_logged_in(db):
     assert logged_in_user["token"] != token1
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
+    cleanup(db, test_user_data["email"])
 
 
 def test_logout_user(db):
@@ -137,11 +156,12 @@ def test_logout_user(db):
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
 
-    logout_user(token0)
+    logout_user(test_user_data["email"], token0)
 
     logged_in_user = logged_in.find_one(query)
 
     assert logged_in_user is None
+    cleanup(db, test_user_data["email"])
 
 
 def test_logout_user_failed(db):
@@ -161,9 +181,10 @@ def test_logout_user_failed(db):
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
 
-    logout_user("not a real token")
+    logout_user(test_user_data["email"], "not a real token")
 
     logged_in_user = logged_in.find_one(query)
 
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
+    cleanup(db, test_user_data["email"])

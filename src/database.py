@@ -1,10 +1,10 @@
+import logging
 from typing import Optional
 
 from pymongo import MongoClient
 
 from src.constants import DB_CLIENT_PREFIX, ENVOY
-
-# from src.helpers import encrypt_password, generate_token
+from src.helpers import generate_token
 
 
 def connect_to_db():
@@ -45,14 +45,48 @@ def login_user(email: str, password: str) -> str:
     """
     Generates new token for user and saves to db and returns
     """
-    # db = connect_to_db()
-    token = ""
-    return token
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+
+    user = users.find_one(query)
+
+    if user is not None:
+        if user["password"] != password:
+            logging.error(f"Password incorrect for {email}")
+            return
+
+        logged_in = db["logged_in"]
+
+        if (
+            logged_in.find_one(query) is not None
+            and logged_in.find_one(query)["email"] == email
+        ):
+            logging.error(f"{email} is already logged in.")
+            return
+
+        token = generate_token()
+        logged_in.insert_one({"email": email, "token": token})
+
+        return token
+    logging.error(f"{email} is not a registered user.")
 
 
-def logout_user(token: str) -> None:
+def logout_user(email: str, token: str) -> None:
     """
     Remove logged in entry from db
     """
-    # db = connect_to_db()
-    pass
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+
+    query = {"email": email}
+
+    logged_in_user = logged_in.find_one(query)
+    if logged_in_user is None:
+        logging.error(f"{email} is not logged in")
+        return
+    if logged_in_user["token"] != token:
+        logging.error(f"{token} doesn't belong to {email}")
+        return
+
+    logged_in.delete_one(query)
