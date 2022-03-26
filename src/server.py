@@ -1,7 +1,7 @@
 from flask import Flask, request
 
-from src.auth import signup
-from src.database import db_cleanup
+from auth import signup
+from database import db_cleanup
 
 APP = Flask(__name__)
 
@@ -13,16 +13,17 @@ def default_route():
 
 @APP.route("/signup", methods=["POST"])
 def signup_route():
-    data = request.get_json()
-    res = signup(data)
-    print(res)
-    return ""
+    body = request.get_json()
+    response = signup(body)
+    return response
 
 
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():
     # DEV ONLY ROUTE SHOULD
     # FIND A WAY TO REMOVE IN PROD
-    db_cleanup()
-    res = {"msg": "Removed all data stored in database."}
+    users_val, logged_in_val = db_cleanup()
+    res = {
+        "msg": f"Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
+    }
     return res
