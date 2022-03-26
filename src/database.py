@@ -3,8 +3,8 @@ from typing import Optional
 
 from pymongo import MongoClient
 
-from src.constants import DB_CLIENT_PREFIX, ENVOY
-from src.helpers import generate_token
+from constants import DB_CLIENT_PREFIX, ENVOY
+from helpers import generate_token
 
 
 def connect_to_db():
@@ -90,3 +90,16 @@ def logout_user(email: str, token: str) -> None:
         return
 
     logged_in.delete_one(query)
+
+
+def db_cleanup():
+    db = connect_to_db()
+    users = db["users"]
+    logged_in = db["logged_in"]
+
+    users_data = users.delete_many({})
+    logging.info(f"Removed {users_data.deleted_count} documents from users collection.")
+    logged_in_data = logged_in.delete_many({})
+    logging.info(
+        f"Removed {logged_in_data.deleted_count} documents from logged_in collection."
+    )
