@@ -3,8 +3,8 @@ from typing import Optional
 
 from pymongo import MongoClient
 
-from src.constants import DB_CLIENT_PREFIX, ENVOY
-from src.helpers import generate_token
+from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY
+from api_adapter.helpers import generate_token
 
 
 def connect_to_db():
@@ -29,7 +29,7 @@ def register_user(user_data: dict) -> str:
     Creates document in db containing users information including hashed password, returning a generated token
     """
     if get_user(user_data["email"]):
-        return "user already registered"
+        return f"An account with email: {user_data['email']} is already registered"
 
     db = connect_to_db()
 
@@ -92,7 +92,7 @@ def logout_user(email: str, token: str) -> None:
     logged_in.delete_one(query)
 
 
-def db_cleanup():
+def db_cleanup() -> int:
     db = connect_to_db()
     users = db["users"]
     logged_in = db["logged_in"]
@@ -103,3 +103,4 @@ def db_cleanup():
     logging.info(
         f"Removed {logged_in_data.deleted_count} documents from logged_in collection."
     )
+    return users_data.deleted_count, logged_in_data.deleted_count

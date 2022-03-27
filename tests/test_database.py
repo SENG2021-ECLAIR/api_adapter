@@ -1,6 +1,12 @@
 import pytest
 
-from src.database import connect_to_db, get_user, login_user, logout_user, register_user
+from api_adapter.database import (
+    connect_to_db,
+    get_user,
+    login_user,
+    logout_user,
+    register_user,
+)
 
 test_user_data = {
     "email": "test@email.com",
@@ -24,11 +30,12 @@ def db():
 
 
 def test_get_user(db):
+    cleanup(db, test_user_data["email"])
     register_user(test_user_data)
     user = get_user(test_user_data["email"])
 
     assert user["email"] == test_user_data["email"]
-    assert user["password"] == "somepassword"
+    assert user["password"] == test_user_data["password"]
 
     cleanup(db, test_user_data["email"])
 
@@ -55,7 +62,10 @@ def test_register_user(db):
 
     response = register_user(test_user_data)
 
-    assert response == "user already registered"
+    assert (
+        response
+        == f"An account with email: {test_user_data['email']} is already registered"
+    )
 
     cleanup(db, test_user_data["email"])
 
