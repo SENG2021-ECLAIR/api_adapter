@@ -7,7 +7,6 @@ from api_adapter.database import (
     logout_user,
     register_user,
 )
-from api_adapter.helpers import encrypt_password
 
 test_user_data = {
     "email": "test@email.com",
@@ -31,11 +30,12 @@ def db():
 
 
 def test_get_user(db):
+    cleanup(db, test_user_data["email"])
     register_user(test_user_data)
     user = get_user(test_user_data["email"])
 
     assert user["email"] == test_user_data["email"]
-    assert user["password"] == encrypt_password(test_user_data["password"])
+    assert user["password"] == test_user_data["password"]
 
     cleanup(db, test_user_data["email"])
 
