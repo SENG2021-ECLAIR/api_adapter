@@ -1,7 +1,7 @@
 from flask import Flask, request
 
-from auth import signup
-from database import db_cleanup
+from  api_adapter.auth import signup
+from  api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
 

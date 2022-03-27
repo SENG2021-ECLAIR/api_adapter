@@ -1,6 +1,6 @@
 import coloredlogs
 
-from server import APP
+from api_adapter.server import APP
 
 coloredlogs.install(fmt="%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s")
 

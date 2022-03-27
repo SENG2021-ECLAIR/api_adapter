@@ -1,7 +1,7 @@
 import pytest
 
-from src.auth import signup, valid_email, valid_name, valid_password
-from src.database import connect_to_db
+from api_adapter.auth import signup, valid_email, valid_name, valid_password
+from api_adapter.database import connect_to_db
 
 test_user_data = {
     "email": "test@email.com",
@@ -39,7 +39,7 @@ def test_signup(db):
     assert logged_in_collection.find_one(query) is not None
 
     assert "token" in result
-    assert result["msg"] == f"User {test_user_data['email']} registered"
+    assert result["msg"] == f"User {test_user_data['email']} registered and logged in."
 
     cleanup(db, test_user_data["email"])
 
