@@ -3,12 +3,12 @@ Functionality that allows for the user to:
     - sign up
     - log in
     - log out
-""" 
+"""
 
 import re
 
-from  api_adapter.database import login_user, register_user
-from  api_adapter.helpers import encrypt_password
+from api_adapter.database import login_user, register_user
+from api_adapter.helpers import encrypt_password
 
 
 def signup(user_data) -> str:
