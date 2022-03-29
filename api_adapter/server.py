@@ -6,12 +6,12 @@ Endpoints that allows for the user to use the buttons:
     - login
     - log out
     - sign up
-""" 
+"""
 
 from flask import Flask, request
 
-from  api_adapter.auth import signup
-from  api_adapter.database import db_cleanup
+from api_adapter.auth import signup
+from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
 
