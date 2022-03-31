@@ -1,1 +1,1 @@
-web: gunicorn wsgi:api_adapter
+web: gunicorn wsgi:APP
