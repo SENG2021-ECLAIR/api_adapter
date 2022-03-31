@@ -7,7 +7,7 @@ Functionality that allows for the user to:
 
 import re
 
-from api_adapter.database import login_user, register_user
+from api_adapter.database import login_user, logout_user, register_user
 from api_adapter.helpers import encrypt_password
 
 
@@ -43,7 +43,11 @@ def signup(user_data: dict) -> dict:
 
     user_data["password"] = encrypt_password(user_data["password"])
     msg = register_user(user_data)
+    if msg != f"User {user_data['email']} registered":
+        return {"msg": msg, "token": None}
+
     token, _ = login_user(user_data["email"], user_data["password"])
+
     if token is not None:
         msg += " and logged in."
     return {"msg": msg, "token": token}
@@ -65,7 +69,6 @@ def login(credentials: dict) -> dict:
                 "token": string
             }
     """
-
     if not valid_email(credentials["email"]):
         return {"msg": f"{credentials['email']} is not a valid email."}
 
@@ -76,8 +79,23 @@ def login(credentials: dict) -> dict:
     return {"msg": msg, "token": token}
 
 
-def logout():
-    pass
+def logout(data: dict) -> dict:
+    """
+    Logs the user out of their account given a token and returns a msg.
+
+        Parameters:
+            data: dict = {
+                "token": string
+                "email": string
+            }
+
+        Returns:
+            response: dict = {
+                "msg": string
+            }
+    """
+    msg = logout_user(data["email"], data["token"])
+    return {"msg": msg}
 
 
 def valid_email(email: str) -> bool:
