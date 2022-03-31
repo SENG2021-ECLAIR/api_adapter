@@ -15,6 +15,8 @@ from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
 
+EMPTY_BODY_STRING = "YOU'VE GIVEN ME AN EMPTY BODY :("
+
 
 @APP.route("/")
 def default_route():
@@ -24,6 +26,9 @@ def default_route():
 @APP.route("/signup", methods=["POST"])
 def signup_route():
     body = request.get_json()
+    print(body)
+    if body is None:
+        return {"msg": EMPTY_BODY_STRING}
     response = signup(body)
     return response
 
