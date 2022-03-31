@@ -1,6 +1,6 @@
 from flask import Flask, request
 
-from api_adapter.auth import login, signup
+from api_adapter.auth import login, logout, signup
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
@@ -22,6 +22,13 @@ def signup_route():
 def login_route():
     body = request.get_json()
     response = login(body)
+    return response
+
+
+@APP.route("/logout", methods=["POST"])
+def logout_route():
+    body = request.get_json()
+    response = logout(body)
     return response
 
 
