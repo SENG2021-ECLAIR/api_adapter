@@ -1,1 +1,1 @@
-web:poetry run python api_adapter/main.py
+web: gunicorn wsgi:api_adapter
