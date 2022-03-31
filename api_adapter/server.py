@@ -10,7 +10,7 @@ Endpoints that allows for the user to use the buttons:
 
 from flask import Flask, request
 
-from api_adapter.auth import signup
+from api_adapter.auth import login, logout, signup
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
@@ -25,6 +25,20 @@ def default_route():
 def signup_route():
     body = request.get_json()
     response = signup(body)
+    return response
+
+
+@APP.route("/login", methods=["POST"])
+def login_route():
+    body = request.get_json()
+    response = login(body)
+    return response
+
+
+@APP.route("/logout", methods=["POST"])
+def logout_route():
+    body = request.get_json()
+    response = logout(body)
     return response
 
 

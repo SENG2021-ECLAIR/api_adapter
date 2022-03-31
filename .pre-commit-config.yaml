@@ -19,4 +19,4 @@ repos:
         args: ["--profile", "black"]
 default_language_version:
     python: python3
-files: ^(src|tests)/.+$
+files: ^(api_adapter|tests)/.+$
