@@ -79,6 +79,32 @@ def test_login(db, test_user_data):
     cleanup(db, test_user_data["email"])
 
 
+def test_logout(db, test_user_data):
+    users_collection = db["users"]
+    logged_in_collection = db["logged_in"]
+    cleanup(db, test_user_data["email"])
+    query = {"email": test_user_data["email"]}
+
+    assert users_collection.find_one(query) is None
+    assert logged_in_collection.find_one(query) is None
+
+    result = signup(test_user_data)
+
+    assert users_collection.find_one(query) is not None
+    assert logged_in_collection.find_one(query) is not None
+
+    assert "token" in result
+    assert result["msg"] == f"User {test_user_data['email']} registered and logged in"
+
+    logout_result = logout({"email": test_user_data["email"], "token": result["token"]})
+
+    assert logout_result["msg"] == f"Successfully logged out {test_user_data['email']}"
+    assert users_collection.find_one(query) is not None
+    assert logged_in_collection.find_one(query) is None
+
+    cleanup(db, test_user_data["email"])
+
+
 def test_valid_email():
     assert valid_email("a1@b.co")
     assert valid_email("seng2021@gmail.com")
