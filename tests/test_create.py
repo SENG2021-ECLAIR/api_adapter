@@ -105,7 +105,10 @@ def test_successful_creation():
     Should create invoice with no error.
     '''
 
-    deets1 = requests.post(url + "/create", json=SAMPLE_INVOICE)
+    deets1 = requests.post(url + "/create", json= {
+            "invoice_details": SAMPLE_INVOICE
+        }
+    )
 
     assert deets1.status_code == OK
 
@@ -118,6 +121,9 @@ def test_error_invalid_input():
     Should return error.
     '''
 
-    deets1 = requests.post(url + "/create", json=SAMPLE_INVALID_INVOICE)
+    deets1 = requests.post(url + "/create", json={
+            "invoice_details": SAMPLE_INVALID_INVOICE
+        }
+    )
 
     assert deets1.status_code == INVALID_INPUT
