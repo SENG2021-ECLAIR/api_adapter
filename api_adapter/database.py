@@ -65,15 +65,15 @@ def login_user(email: str, password: str) -> str:
             logged_in.find_one(query) is not None
             and logged_in.find_one(query)["email"] == email
         ):
-            logging.error(f"{email} is already logged in.")
-            return None, f"{email} is already logged in."
+            logging.error(f"{email} is already logged in")
+            return None, f"{email} is already logged in"
 
         token = generate_token()
         logged_in.insert_one({"email": email, "token": token})
 
         return token, f"{email} is now logged in"
-    logging.error(f"{email} is not a registered user.")
-    return None, f"{email} is not a registered user."
+    logging.error(f"{email} is not a registered user")
+    return None, f"{email} is not a registered user"
 
 
 def logout_user(email: str, token: str) -> None:
@@ -103,9 +103,9 @@ def db_cleanup() -> int:
     logged_in = db["logged_in"]
 
     users_data = users.delete_many({})
-    logging.info(f"Removed {users_data.deleted_count} documents from users collection.")
+    logging.info(f"Removed {users_data.deleted_count} documents from users collection")
     logged_in_data = logged_in.delete_many({})
     logging.info(
-        f"Removed {logged_in_data.deleted_count} documents from logged_in collection."
+        f"Removed {logged_in_data.deleted_count} documents from logged_in collection"
     )
     return users_data.deleted_count, logged_in_data.deleted_count

@@ -1,3 +1,10 @@
+"""
+Functionality that allows for the user to:
+    - sign up
+    - log in
+    - log out
+"""
+
 import re
 
 from api_adapter.database import login_user, logout_user, register_user
@@ -24,7 +31,7 @@ def signup(user_data: dict) -> dict:
 
     """
     if not valid_email(user_data["email"]):
-        return {"msg": f"{user_data['email']} is not a valid email."}
+        return {"msg": f"{user_data['email']} is not a valid email"}
 
     if not valid_password(user_data["password"]):
         return {
@@ -32,7 +39,7 @@ def signup(user_data: dict) -> dict:
         }
 
     if not valid_name(user_data["firstname"]) and user_data["lastname"]:
-        return {"msg": "First and Last names must not be empty."}
+        return {"msg": "First and Last names must not be empty"}
 
     user_data["password"] = encrypt_password(user_data["password"])
     msg = register_user(user_data)
@@ -42,7 +49,7 @@ def signup(user_data: dict) -> dict:
     token, _ = login_user(user_data["email"], user_data["password"])
 
     if token is not None:
-        msg += " and logged in."
+        msg += " and logged in"
     return {"msg": msg, "token": token}
 
 
@@ -63,7 +70,7 @@ def login(credentials: dict) -> dict:
             }
     """
     if not valid_email(credentials["email"]):
-        return {"msg": f"{credentials['email']} is not a valid email."}
+        return {"msg": f"{credentials['email']} is not a valid email"}
 
     encrypted_password = encrypt_password(credentials["password"])
 

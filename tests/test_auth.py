@@ -1,14 +1,14 @@
 import pytest
 
-from api_adapter.auth import signup, valid_email, valid_name, valid_password
+from api_adapter.auth import (
+    login,
+    logout,
+    signup,
+    valid_email,
+    valid_name,
+    valid_password,
+)
 from api_adapter.database import connect_to_db
-
-test_user_data = {
-    "email": "test@email.com",
-    "firstname": "Test",
-    "lastname": "Email",
-    "password": "SomePassword123",
-}
 
 
 def cleanup(db, email):
@@ -24,7 +24,17 @@ def db():
     return connect_to_db()
 
 
-def test_signup(db):
+@pytest.fixture
+def test_user_data():
+    return {
+        "email": "test@email.com",
+        "firstname": "Test",
+        "lastname": "Email",
+        "password": "SomePassword123",
+    }
+
+
+def test_signup(db, test_user_data):
     users_collection = db["users"]
     logged_in_collection = db["logged_in"]
     cleanup(db, test_user_data["email"])
@@ -39,7 +49,32 @@ def test_signup(db):
     assert logged_in_collection.find_one(query) is not None
 
     assert "token" in result
-    assert result["msg"] == f"User {test_user_data['email']} registered and logged in."
+    assert result["msg"] == f"User {test_user_data['email']} registered and logged in"
+
+    cleanup(db, test_user_data["email"])
+
+
+def test_login(db, test_user_data):
+    users_collection = db["users"]
+    logged_in_collection = db["logged_in"]
+    cleanup(db, test_user_data["email"])
+
+    query = {"email": test_user_data["email"]}
+
+    result = signup(test_user_data)
+
+    _ = logout({"email": test_user_data["email"], "token": result["token"]})
+
+    assert users_collection.find_one(query) is not None
+    assert logged_in_collection.find_one(query) is None
+
+    result = login({"email": test_user_data["email"], "password": "SomePassword123"})
+
+    assert users_collection.find_one(query) is not None
+    assert logged_in_collection.find_one(query) is not None
+
+    assert "token" in result
+    assert result["msg"] == f"{test_user_data['email']} is now logged in"
 
     cleanup(db, test_user_data["email"])
 
