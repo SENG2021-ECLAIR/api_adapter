@@ -1,3 +1,7 @@
+"""
+The file that actively runs the server in `server.py`
+"""
+
 import coloredlogs
 
 from api_adapter.server import APP

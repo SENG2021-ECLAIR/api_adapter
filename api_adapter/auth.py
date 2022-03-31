@@ -1,3 +1,10 @@
+"""
+Functionality that allows for the user to:
+    - sign up
+    - log in
+    - log out
+"""
+
 import re
 
 from api_adapter.database import login_user, register_user
