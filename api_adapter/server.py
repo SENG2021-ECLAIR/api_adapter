@@ -42,6 +42,12 @@ def logout_route():
     return response
 
 
+@APP.route("/send", methods=["POST"])
+def send_route():
+    body = request.get_json()
+    response = send(body)
+    return json.dumps(response)
+
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():
     # DEV ONLY ROUTE SHOULD
