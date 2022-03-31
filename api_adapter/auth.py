@@ -1,10 +1,10 @@
 import re
 
-from  api_adapter.database import login_user, register_user
-from  api_adapter.helpers import encrypt_password
+from api_adapter.database import login_user, register_user
+from api_adapter.helpers import encrypt_password
 
 
-def signup(user_data) -> str:
+def signup(user_data: dict) -> dict:
     """
     Signs up the user given some data about the user.
 
@@ -18,8 +18,8 @@ def signup(user_data) -> str:
 
         Returns:
             data: dict = {
-                message: str => Unique
-                token: str => Unique
+                message: string
+                token: string
             }
 
     """
@@ -36,14 +36,37 @@ def signup(user_data) -> str:
 
     user_data["password"] = encrypt_password(user_data["password"])
     msg = register_user(user_data)
-    token = login_user(user_data["email"], user_data["password"])
+    token, _ = login_user(user_data["email"], user_data["password"])
     if token is not None:
         msg += " and logged in."
     return {"msg": msg, "token": token}
 
 
-def login():
-    pass
+def login(credentials: dict) -> dict:
+    """
+    Logs the user into their account given a username and password and returns a token.
+
+        Parameters:
+            credentials: dict = {
+                "email": string,
+                "password": string
+            }
+
+        Returns:
+            data: dict = {
+                "message": string,
+                "token": string
+            }
+    """
+
+    if not valid_email(credentials["email"]):
+        return {"msg": f"{credentials['email']} is not a valid email."}
+
+    encrypted_password = encrypt_password(credentials["password"])
+
+    token, msg = login_user(credentials["email"], encrypted_password)
+
+    return {"msg": msg, "token": token}
 
 
 def logout():
