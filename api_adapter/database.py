@@ -88,12 +88,13 @@ def logout_user(email: str, token: str) -> None:
     logged_in_user = logged_in.find_one(query)
     if logged_in_user is None:
         logging.error(f"{email} is not logged in")
-        return
+        return f"{email} is not logged in"
     if logged_in_user["token"] != token:
         logging.error(f"{token} doesn't belong to {email}")
-        return
+        return f"{token} doesn't belong to {email}"
 
     logged_in.delete_one(query)
+    return f"Successfully logged out {email}."
 
 
 def db_cleanup() -> int:
