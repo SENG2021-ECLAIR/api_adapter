@@ -94,7 +94,7 @@ def logout_user(email: str, token: str) -> None:
         return f"{token} doesn't belong to {email}"
 
     logged_in.delete_one(query)
-    return f"Successfully logged out {email}."
+    return f"Successfully logged out {email}"
 
 
 def db_cleanup() -> int:
