@@ -1,7 +1,7 @@
 from flask import Flask, request
 
-from  api_adapter.auth import signup
-from  api_adapter.database import db_cleanup
+from api_adapter.auth import login, signup
+from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
 
@@ -15,6 +15,13 @@ def default_route():
 def signup_route():
     body = request.get_json()
     response = signup(body)
+    return response
+
+
+@APP.route("/login", methods=["POST"])
+def login_route():
+    body = request.get_json()
+    response = login(body)
     return response
 
 
