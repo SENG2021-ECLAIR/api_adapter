@@ -1,1 +1,1 @@
-web: poetry run python api_adapter/main.py
+web:poetry run python api_adapter/main.py
