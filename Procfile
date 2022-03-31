@@ -1,0 +1,1 @@
+web: poetry run python api_adapter/main.py
