@@ -29,6 +29,9 @@ def register_user(user_data: dict) -> str:
     Creates document in db containing users information including hashed password, returning a generated token
     """
     if get_user(user_data["email"]):
+        logging.error(
+            f"An account with email: {user_data['email']} is already registered"
+        )
         return f"An account with email: {user_data['email']} is already registered"
 
     db = connect_to_db()
@@ -54,7 +57,7 @@ def login_user(email: str, password: str) -> str:
     if user is not None:
         if user["password"] != password:
             logging.error(f"Password incorrect for {email}")
-            return
+            return None, f"Password incorrect for {email}"
 
         logged_in = db["logged_in"]
 
@@ -63,13 +66,14 @@ def login_user(email: str, password: str) -> str:
             and logged_in.find_one(query)["email"] == email
         ):
             logging.error(f"{email} is already logged in.")
-            return
+            return None, f"{email} is already logged in."
 
         token = generate_token()
         logged_in.insert_one({"email": email, "token": token})
 
-        return token
+        return token, f"{email} is now logged in"
     logging.error(f"{email} is not a registered user.")
+    return None, f"{email} is not a registered user."
 
 
 def logout_user(email: str, token: str) -> None:
