@@ -9,11 +9,13 @@ Endpoints that allows for the user to use the buttons:
 """
 
 from flask import Flask, request
+from flask_cors import CORS
 
 from api_adapter.auth import signup
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
+CORS(APP)
 
 EMPTY_BODY_STRING = "YOU'VE GIVEN ME AN EMPTY BODY :("
 
