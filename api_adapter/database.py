@@ -28,12 +28,6 @@ def register_user(user_data: dict) -> str:
     """
     Creates document in db containing users information including hashed password, returning a generated token
     """
-    if get_user(user_data["email"]):
-        logging.error(
-            f"An account with email: {user_data['email']} is already registered"
-        )
-        return f"An account with email: {user_data['email']} is already registered"
-
     db = connect_to_db()
 
     email = user_data["email"]
