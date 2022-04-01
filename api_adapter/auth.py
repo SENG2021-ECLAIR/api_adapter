@@ -44,7 +44,7 @@ def signup(user_data: dict) -> dict:
 
     if not valid_password(user_data["password"]):
         return {
-            "msg": "Password needs to be minimum 6 characters and contain at least 1 capital letter and 1 number"
+            "msg": "Password needs to contain at least 6 characters, 1 capital letter, 1 lowercase letter and 1 number"
         }
 
     if not valid_name(user_data["firstname"]) and user_data["lastname"]:
