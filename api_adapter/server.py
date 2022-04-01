@@ -5,12 +5,15 @@ Endpoints that allows for the user to use the buttons:
     - send
     - login
     - log out
+    - send
     - sign up
 """
 
 from flask import Flask, request
+import json
 
 from api_adapter.auth import login, logout, signup
+from api_adapter.send import send_invoice
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
@@ -45,7 +48,7 @@ def logout_route():
 @APP.route("/send", methods=["POST"])
 def send_route():
     body = request.get_json()
-    response = send(body)
+    response = send_invoice(body)
     return json.dumps(response)
 
 @APP.route("/cleanup", methods=["POST"])
