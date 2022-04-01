@@ -49,7 +49,13 @@ def logout_route():
 def send_route():
     body = request.get_json()
     response = send_invoice(body)
-    return json.dumps(response)
+    return response
+
+# @APP.route("/sendsms", methods=["POST"])
+# def sendsms_route():
+#     body = request.get_json()
+#     response = send_invoice_sms(body)
+#     return json.dumps(response)
 
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():

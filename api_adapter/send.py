@@ -7,9 +7,19 @@ Functionality for the send endpoint
 import requests
 
 def send_invoice(input):
-    post_val = requests.post("https://virtserver.swaggerhub.com/SE2Y22G24/e-invoice-sending/1.0.0/invoice/send/email",
-        json = input)
+    
+    url = "https://virtserver.swaggerhub.com/seng2021/honeycomb/1.0.0/send"
+
+    post_val = requests.post(url, data = input)
+    print(post_val.text)
     return {
-        "status_code": post_val.status_code,
-        "report_id": post_val.json()["report_id"]
+        "status_code": post_val.status_code
     }
+
+# def send_invoice_sms(input):
+#     post_val = requests.post("https://virtserver.swaggerhub.com/SE2Y22G24/e-invoice-sending/1.0.0/invoice/send/email",
+#         json = input)
+#     return {
+#         "status_code": post_val.status_code,
+#         "report_id": post_val.json()["report_id"]
+#     }
