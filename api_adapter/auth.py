@@ -7,11 +7,11 @@ Functionality that allows for the user to:
 
 import re
 
-from api_adapter.database import login_user, register_user
+from api_adapter.database import login_user, logout_user, register_user
 from api_adapter.helpers import encrypt_password
 
 
-def signup(user_data) -> str:
+def signup(user_data: dict) -> dict:
     """
     Signs up the user given some data about the user.
 
@@ -25,13 +25,13 @@ def signup(user_data) -> str:
 
         Returns:
             data: dict = {
-                message: str => Unique
-                token: str => Unique
+                message: string
+                token: string
             }
 
     """
     if not valid_email(user_data["email"]):
-        return {"msg": f"{user_data['email']} is not a valid email."}
+        return {"msg": f"{user_data['email']} is not a valid email"}
 
     if not valid_password(user_data["password"]):
         return {
@@ -39,22 +39,63 @@ def signup(user_data) -> str:
         }
 
     if not valid_name(user_data["firstname"]) and user_data["lastname"]:
-        return {"msg": "First and Last names must not be empty."}
+        return {"msg": "First and Last names must not be empty"}
 
     user_data["password"] = encrypt_password(user_data["password"])
     msg = register_user(user_data)
-    token = login_user(user_data["email"], user_data["password"])
+    if msg != f"User {user_data['email']} registered":
+        return {"msg": msg, "token": None}
+
+    token, _ = login_user(user_data["email"], user_data["password"])
+
     if token is not None:
-        msg += " and logged in."
+        msg += " and logged in"
     return {"msg": msg, "token": token}
 
 
-def login():
-    pass
+def login(credentials: dict) -> dict:
+    """
+    Logs the user into their account given a username and password and returns a token.
+
+        Parameters:
+            credentials: dict = {
+                "email": string,
+                "password": string
+            }
+
+        Returns:
+            data: dict = {
+                "message": string,
+                "token": string
+            }
+    """
+    if not valid_email(credentials["email"]):
+        return {"msg": f"{credentials['email']} is not a valid email"}
+
+    encrypted_password = encrypt_password(credentials["password"])
+
+    token, msg = login_user(credentials["email"], encrypted_password)
+
+    return {"msg": msg, "token": token}
 
 
-def logout():
-    pass
+def logout(data: dict) -> dict:
+    """
+    Logs the user out of their account given a token and returns a msg.
+
+        Parameters:
+            data: dict = {
+                "token": string
+                "email": string
+            }
+
+        Returns:
+            response: dict = {
+                "msg": string
+            }
+    """
+    msg = logout_user(data["email"], data["token"])
+    return {"msg": msg}
 
 
 def valid_email(email: str) -> bool:

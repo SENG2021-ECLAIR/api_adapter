@@ -82,11 +82,12 @@ def test_login_user(db):
     assert users.find_one(query) is not None
     assert logged_in.find_one(query) is None
 
-    token = login_user(test_user_data["email"], test_user_data["password"])
+    token, msg = login_user(test_user_data["email"], test_user_data["password"])
     logged_in_user = logged_in.find_one(query)
 
     assert token is not None
     assert logged_in_user["token"] == token
+    assert msg == f"{logged_in_user['email']} is now logged in"
     assert logged_in_user["email"] == test_user_data["email"]
 
 
@@ -100,9 +101,10 @@ def test_login_user_wrong_password(db):
     assert users.find_one(query) is not None
     assert logged_in.find_one(query) is None
 
-    token = login_user(test_user_data["email"], "incorrect password")
+    token, msg = login_user(test_user_data["email"], "incorrect password")
 
     assert token is None
+    assert msg == f"Password incorrect for {test_user_data['email']}"
     assert logged_in.find_one(query) is None
     cleanup(db, test_user_data["email"])
 
@@ -113,9 +115,10 @@ def test_login_user_not_registered(db):
     query = {"email": test_user_data["email"]}
     cleanup(db, test_user_data["email"])
     assert users.find_one(query) is None
-    token = login_user(test_user_data["email"], test_user_data["password"])
+    token, msg = login_user(test_user_data["email"], test_user_data["password"])
 
     assert token is None
+    assert msg == f"{test_user_data['email']} is not a registered user"
     assert logged_in.find_one(query) is None
     cleanup(db, test_user_data["email"])
 
@@ -132,17 +135,19 @@ def test_login_user_already_logged_in(db):
     assert users.find_one(query) is not None
     assert logged_in.find_one(query) is None
 
-    token0 = login_user(test_user_data["email"], test_user_data["password"])
+    token0, msg0 = login_user(test_user_data["email"], test_user_data["password"])
     logged_in_user = logged_in.find_one(query)
 
     assert token0 is not None
+    assert msg0 == f"{test_user_data['email']} is now logged in"
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
 
-    token1 = login_user(test_user_data["email"], test_user_data["password"])
+    token1, msg1 = login_user(test_user_data["email"], test_user_data["password"])
     logged_in_user = logged_in.find_one(query)
 
     assert token1 is None
+    assert msg1 == f"{test_user_data['email']} is already logged in"
     assert logged_in_user["token"] != token1
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
@@ -159,10 +164,11 @@ def test_logout_user(db):
     assert users.find_one(query) is not None
     assert logged_in.find_one(query) is None
 
-    token0 = login_user(test_user_data["email"], test_user_data["password"])
+    token0, msg = login_user(test_user_data["email"], test_user_data["password"])
     logged_in_user = logged_in.find_one(query)
 
     assert token0 is not None
+    assert msg == f"{logged_in_user['email']} is now logged in"
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
 
@@ -184,7 +190,7 @@ def test_logout_user_failed(db):
     assert users.find_one(query) is not None
     assert logged_in.find_one(query) is None
 
-    token0 = login_user(test_user_data["email"], test_user_data["password"])
+    token0, msg0 = login_user(test_user_data["email"], test_user_data["password"])
     logged_in_user = logged_in.find_one(query)
 
     assert token0 is not None
