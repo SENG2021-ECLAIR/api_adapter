@@ -51,6 +51,14 @@ def test_signup(db, test_user_data):
     assert "token" in result
     assert result["msg"] == f"User {test_user_data['email']} registered and logged in"
 
+    result = signup(test_user_data)
+
+    assert "token" not in result
+    assert (
+        result["msg"]
+        == f"An account with email: {test_user_data['email']} is already registered"
+    )
+
     cleanup(db, test_user_data["email"])
 
 

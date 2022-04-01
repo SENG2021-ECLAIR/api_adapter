@@ -5,9 +5,10 @@ Functionality that allows for the user to:
     - log out
 """
 
+import logging
 import re
 
-from api_adapter.database import login_user, logout_user, register_user
+from api_adapter.database import get_user, login_user, logout_user, register_user
 from api_adapter.helpers import encrypt_password
 
 
@@ -32,6 +33,14 @@ def signup(user_data: dict) -> dict:
     """
     if not valid_email(user_data["email"]):
         return {"msg": f"{user_data['email']} is not a valid email"}
+
+    if get_user(user_data["email"]):
+        logging.error(
+            f"An account with email: {user_data['email']} is already registered"
+        )
+        return {
+            "msg": f"An account with email: {user_data['email']} is already registered"
+        }
 
     if not valid_password(user_data["password"]):
         return {
