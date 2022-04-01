@@ -123,7 +123,7 @@ def valid_password(password: str) -> bool:
         any(x.isupper() for x in password)
         and any(x.islower() for x in password)
         and any(x.isdigit() for x in password)
-        and len(password) >= 7
+        and len(password) >= 6
     ):
         return True
     return False
