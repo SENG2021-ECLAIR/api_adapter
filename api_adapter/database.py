@@ -127,7 +127,7 @@ def get_invoices(token: str) -> Tuple[list, str]:
     logged_in_user = logged_in.find_one(logged_in_query)
     if logged_in_user is None:
         logging.error("Need to login to get invoices")
-        return "Need to login to get invoices"
+        return ([], "Need to login to get invoices")
     users = db["users"]
     users_query = {"email": logged_in_user["email"]}
 
