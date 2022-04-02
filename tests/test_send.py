@@ -11,7 +11,7 @@ INVALID_INPUT = 405
 @pytest.fixture
 def valid_invoice():
     with open("tests/test_data/test_valid_response.xml") as sample_invoice_file:
-        return json.load(sample_invoice_file)
+        return sample_invoice_file
 
 
 def test_successful_ubl(valid_invoice):
