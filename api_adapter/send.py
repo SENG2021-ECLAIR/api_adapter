@@ -6,15 +6,15 @@ Functionality for the send endpoint
 
 import requests
 
+    
+
 def send_invoice(input):
     
-    url = "https://virtserver.swaggerhub.com/seng2021/honeycomb/1.0.0/send"
-
+    url = "https://honeycomb-prod.herokuapp.com/send"
     post_val = requests.post(url, data = input)
-    print(post_val.text)
-    return {
-        "status_code": post_val.status_code
-    }
+    if post_val.status_code == 200:
+        return post_val
+    return None
 
 # def send_invoice_sms(input):
 #     post_val = requests.post("https://virtserver.swaggerhub.com/SE2Y22G24/e-invoice-sending/1.0.0/invoice/send/email",
