@@ -9,12 +9,20 @@ VALID = 200
 INVALID_INPUT = 405
 
 @pytest.fixture
-def sample_invoice():
-    with open("tests/test_data/test_invoice_input.json") as sample_invoice_file:
+def valid_invoice():
+    with open("tests/test_data/test_valid_response.xml") as sample_invoice_file:
         return json.load(sample_invoice_file)
 
 
-@pytest.fixture
-def invalid_invoice():
-    with open("tests/test_data/test_invalid_invoice_input.json") as sample_invoice_file:
-        return json.load(sample_invoice_file)
+def test_successful_ubl(valid_invoice):
+
+    input = {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNDdkNWYxN2I0NDViNDlkOGI2MTZjMCIsImVtYWlsIjoiZXRoYW5oYWZmZW5kZW5AZ21haWwuY29tIiwiaWF0IjoxNjQ4ODc1MTc1fQ.LYXRVSvge2TUU6rv_4y2RWLgiaHDIhW1Ttd-ZRSHlm4",
+        "invoiceTitle": "UBL!!!",
+        "mailContent": "Here is your UBL",
+        "recipientEmail": "z5367576@ad.unsw.edu.au",
+        "file": valid_invoice
+    }
+
+    result = send_invoice(input)
+    assert result.status_code == VALID
