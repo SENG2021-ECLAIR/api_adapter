@@ -1,7 +1,7 @@
 import logging
 import sys
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Tuple
 
 from pymongo import MongoClient
 
@@ -102,8 +102,8 @@ def store_invoice(token: str, invoice: str) -> str:
 
     logged_in_user = logged_in.find_one(logged_in_query)
     if logged_in_user is None:
-        logging.error(f"{logged_in_user['email']} needs to login to store an invoice")
-        return f"{logged_in_user['email']} needs to login to store an invoice"
+        logging.error("Need to login to store an invoice")
+        return "Need to login to store an invoice"
 
     users = db["users"]
     users_query = {"email": logged_in_user["email"]}
@@ -117,6 +117,26 @@ def store_invoice(token: str, invoice: str) -> str:
 
     users.update_one(users_query, {"$push": {"invoices": invoice_data}})
     return f"Successfully created and stored invoice for {logged_in_user['email']}"
+
+
+def get_invoices(token: str) -> Tuple[list, str]:
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    logged_in_query = {"token": token}
+
+    logged_in_user = logged_in.find_one(logged_in_query)
+    if logged_in_user is None:
+        logging.error("Need to login to get invoices")
+        return "Need to login to get invoices"
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+
+    user = users.find_one(users_query)
+    print(user["invoices"])
+    return (
+        user["invoices"],
+        f"Successfully retreived invoices for {logged_in_user['email']}",
+    )
 
 
 def db_cleanup() -> int:

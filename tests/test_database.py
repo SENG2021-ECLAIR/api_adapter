@@ -1,13 +1,11 @@
-import pytest
-
 from api_adapter.database import (
-    connect_to_db,
     get_user,
     login_user,
     logout_user,
     register_user,
     store_invoice,
 )
+from tests.conftest import cleanup
 
 test_user_data = {
     "email": "test@email.com",
@@ -15,19 +13,6 @@ test_user_data = {
     "lastname": "email",
     "password": "somepassword",
 }
-
-
-def cleanup(db, email):
-    users = db["users"]
-    logged_in = db["logged_in"]
-
-    users.delete_one({"email": email})
-    logged_in.delete_one({"email": email})
-
-
-@pytest.fixture
-def db():
-    return connect_to_db()
 
 
 def test_get_user(db):
