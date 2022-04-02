@@ -10,10 +10,14 @@ def create_invoice(invoice_details):
     return_val = requests.post(
         "seng-donut-frontend.azurewebsites.net/json/convert",
         json={
-            "body"=invoice_details
+            invoice_details
         }
     )
     return {
         "status_code": return_val.status_code,
-        "invoice": return_val.json()["invoice"]
+        "invoice": return_val.json()
     }
+
+
+# def store_invoice(person deets, invoice_xml):
+#     pass
