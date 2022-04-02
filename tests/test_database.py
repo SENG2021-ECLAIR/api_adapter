@@ -60,13 +60,6 @@ def test_register_user(db):
     assert users.find_one(query) is not None
     assert response == f"User {test_user_data['email']} registered"
 
-    response = register_user(test_user_data)
-
-    assert (
-        response
-        == f"An account with email: {test_user_data['email']} is already registered"
-    )
-
     cleanup(db, test_user_data["email"])
 
 

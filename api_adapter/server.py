@@ -10,6 +10,7 @@ Endpoints that allows for the user to use the buttons:
 
 from flask import Flask, request
 import json
+from flask_cors import CORS
 
 
 from api_adapter.create import create_invoice
@@ -17,6 +18,9 @@ from api_adapter.auth import login, logout, signup
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
+CORS(APP)
+
+EMPTY_BODY_STRING = "YOU'VE GIVEN ME AN EMPTY BODY :("
 
 
 @APP.route("/")
@@ -27,6 +31,9 @@ def default_route():
 @APP.route("/signup", methods=["POST"])
 def signup_route():
     body = request.get_json()
+    print(body)
+    if body is None:
+        return {"msg": EMPTY_BODY_STRING}
     response = signup(body)
     return response
 
