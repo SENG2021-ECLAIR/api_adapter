@@ -1,7 +1,7 @@
 """
 Functionality that is behind the "create" endpoint. This:
     - creates and validates the invoice via an API
-    - stores the invoice via an API
+    - stores the invoice in mongoDB
 """
 
 from typing import Optional
