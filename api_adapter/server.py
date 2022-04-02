@@ -8,13 +8,14 @@ Endpoints that allows for the user to use the buttons:
     - sign up
 """
 
-from flask import Flask, request
 import json
+import logging
+
+from flask import Flask, request
 from flask_cors import CORS
 
-
-from api_adapter.create import create_invoice
 from api_adapter.auth import login, logout, signup
+from api_adapter.create import persist_invoice
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
@@ -37,11 +38,6 @@ def signup_route():
     response = signup(body)
     return response
 
-@APP.route("/create", methods=["POST"])
-def signup_route():
-    body = request.get_json()
-    response = create_invoice(body)
-    return json.dumps(response)
 
 @APP.route("/login", methods=["POST"])
 def login_route():
@@ -55,6 +51,14 @@ def logout_route():
     body = request.get_json()
     response = logout(body)
     return response
+
+
+@APP.route("/create", methods=["POST"])
+def create_route():
+    body = request.get_json()
+    logging.error(body)
+    response = persist_invoice(body["token"], body["invoice_data"])
+    return json.dumps(response)
 
 
 @APP.route("/cleanup", methods=["POST"])
