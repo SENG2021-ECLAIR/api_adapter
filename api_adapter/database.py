@@ -1,5 +1,7 @@
 import logging
-from typing import Optional
+import sys
+from datetime import datetime
+from typing import Optional, Tuple
 
 from pymongo import MongoClient
 
@@ -28,15 +30,11 @@ def register_user(user_data: dict) -> str:
     """
     Creates document in db containing users information including hashed password, returning a generated token
     """
-    if get_user(user_data["email"]):
-        logging.error(
-            f"An account with email: {user_data['email']} is already registered"
-        )
-        return f"An account with email: {user_data['email']} is already registered"
-
     db = connect_to_db()
 
     email = user_data["email"]
+    user_data["invoices"] = []
+    print(user_data)
 
     users = db["users"]
     users.insert_one(user_data)
@@ -76,7 +74,7 @@ def login_user(email: str, password: str) -> str:
     return None, f"{email} is not a registered user"
 
 
-def logout_user(email: str, token: str) -> None:
+def logout_user(email: str, token: str) -> str:
     """
     Remove logged in entry from db
     """
@@ -95,6 +93,50 @@ def logout_user(email: str, token: str) -> None:
 
     logged_in.delete_one(query)
     return f"Successfully logged out {email}"
+
+
+def store_invoice(token: str, invoice: str) -> str:
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    logged_in_query = {"token": token}
+
+    logged_in_user = logged_in.find_one(logged_in_query)
+    if logged_in_user is None:
+        logging.error("Need to login to store an invoice")
+        return "Need to login to store an invoice"
+
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+
+    invoice_data = {
+        "customer_name": "Some Customer",
+        "timestamp": datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+        "size": sys.getsizeof(invoice),
+        "content": invoice,
+    }
+
+    users.update_one(users_query, {"$push": {"invoices": invoice_data}})
+    return f"Successfully created and stored invoice for {logged_in_user['email']}"
+
+
+def get_invoices(token: str) -> Tuple[list, str]:
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    logged_in_query = {"token": token}
+
+    logged_in_user = logged_in.find_one(logged_in_query)
+    if logged_in_user is None:
+        logging.error("Need to login to get invoices")
+        return "Need to login to get invoices"
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+
+    user = users.find_one(users_query)
+    print(user["invoices"])
+    return (
+        user["invoices"],
+        f"Successfully retreived invoices for {logged_in_user['email']}",
+    )
 
 
 def db_cleanup() -> int:

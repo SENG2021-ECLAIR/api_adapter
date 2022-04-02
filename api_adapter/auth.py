@@ -5,9 +5,10 @@ Functionality that allows for the user to:
     - log out
 """
 
+import logging
 import re
 
-from api_adapter.database import login_user, logout_user, register_user
+from api_adapter.database import get_user, login_user, logout_user, register_user
 from api_adapter.helpers import encrypt_password
 
 
@@ -33,9 +34,17 @@ def signup(user_data: dict) -> dict:
     if not valid_email(user_data["email"]):
         return {"msg": f"{user_data['email']} is not a valid email"}
 
+    if get_user(user_data["email"]):
+        logging.error(
+            f"An account with email: {user_data['email']} is already registered"
+        )
+        return {
+            "msg": f"An account with email: {user_data['email']} is already registered"
+        }
+
     if not valid_password(user_data["password"]):
         return {
-            "msg": "Password needs to be minimum 6 characters and contain at least 1 capital letter and 1 number"
+            "msg": "Password needs to contain at least 6 characters, 1 capital letter, 1 lowercase letter and 1 number"
         }
 
     if not valid_name(user_data["firstname"]) and user_data["lastname"]:
@@ -114,7 +123,7 @@ def valid_password(password: str) -> bool:
         any(x.isupper() for x in password)
         and any(x.islower() for x in password)
         and any(x.isdigit() for x in password)
-        and len(password) >= 7
+        and len(password) >= 6
     ):
         return True
     return False
