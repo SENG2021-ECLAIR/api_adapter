@@ -12,9 +12,7 @@ def send_invoice(input):
     
     url = "https://honeycomb-prod.herokuapp.com/send"
     post_val = requests.post(url, data = input)
-    if post_val.status_code == 200:
-        return post_val
-    return None
+    return post_val
 
 # def send_invoice_sms(input):
 #     post_val = requests.post("https://virtserver.swaggerhub.com/SE2Y22G24/e-invoice-sending/1.0.0/invoice/send/email",
