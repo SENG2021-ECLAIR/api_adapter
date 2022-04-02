@@ -18,6 +18,7 @@ from api_adapter.auth import login, logout, signup
 from api_adapter.create import persist_invoice
 from api_adapter.database import db_cleanup
 from api_adapter.listing import list_invoices
+from api_adapter.render import get_render
 
 APP = Flask(__name__)
 CORS(APP)
@@ -79,6 +80,16 @@ def list_invoices_route():
     if token is None:
         return {"msg": "Needs token in headers"}
     response = list_invoices(token)
+    return json.dumps(response)
+
+
+@APP.route("/invoice/render", methods=["GET"])
+def render_invoice_route():
+    token = request.headers.get("token")
+    invoice_id = request.headers.get("invoice_id")
+    if token is None or invoice_id is None:
+        return {"msg": "Needs token and invoice_id in headers"}
+    response = get_render(token, int(invoice_id))
     return json.dumps(response)
 
 
