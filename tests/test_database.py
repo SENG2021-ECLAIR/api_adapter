@@ -6,6 +6,7 @@ from api_adapter.database import (
     login_user,
     logout_user,
     register_user,
+    store_invoice,
 )
 
 test_user_data = {
@@ -197,3 +198,35 @@ def test_logout_user_failed(db):
     assert logged_in_user["token"] == token0
     assert logged_in_user["email"] == test_user_data["email"]
     cleanup(db, test_user_data["email"])
+
+
+def test_store_invoice(db):
+    users = db["users"]
+    cleanup(db, test_user_data["email"])
+    query = {"email": test_user_data["email"]}
+
+    # Register and login test user
+    _ = register_user(test_user_data)
+    token, _ = login_user(test_user_data["email"], test_user_data["password"])
+
+    user = users.find_one(query)
+
+    assert user["invoices"] == []
+
+    msg = store_invoice(token, "somestring")
+    user = users.find_one(query)
+
+    assert (
+        msg == f"Successfully created and stored invoice for {test_user_data['email']}"
+    )
+    assert len(user["invoices"]) == 1
+    assert user["invoices"][0]["content"] == "somestring"
+
+    msg = store_invoice(token, "some other string")
+    user = users.find_one(query)
+
+    assert (
+        msg == f"Successfully created and stored invoice for {test_user_data['email']}"
+    )
+    assert len(user["invoices"]) == 2
+    assert user["invoices"][1]["content"] == "some other string"
