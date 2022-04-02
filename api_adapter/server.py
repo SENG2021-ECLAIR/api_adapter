@@ -11,8 +11,9 @@ Endpoints that allows for the user to use the buttons:
 from flask import Flask, request
 import json
 
-from api_adapter.auth import signup
-from api_adapter.create import signup
+
+from api_adapter.create import create_invoice
+from api_adapter.auth import login, logout, signup
 from api_adapter.database import db_cleanup
 
 APP = Flask(__name__)
@@ -32,8 +33,22 @@ def signup_route():
 @APP.route("/create", methods=["POST"])
 def signup_route():
     body = request.get_json()
-    response = signup(body["invoice_details"])
+    response = create_invoice(body)
     return json.dumps(response)
+
+@APP.route("/login", methods=["POST"])
+def login_route():
+    body = request.get_json()
+    response = login(body)
+    return response
+
+
+@APP.route("/logout", methods=["POST"])
+def logout_route():
+    body = request.get_json()
+    response = logout(body)
+    return response
+
 
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():
