@@ -34,8 +34,13 @@ def default_route():
 def signup_route():
     body = request.get_json()
     print(body)
-    if body is None:
-        return {"msg": EMPTY_BODY_STRING}
+    if (
+        "email" not in body
+        or "password" not in body
+        or "firstname" not in body
+        or "lastname" not in body
+    ):
+        return {"msg": "Needs email, password, firstname and lastname in body"}
     response = signup(body)
     return response
 
@@ -43,6 +48,8 @@ def signup_route():
 @APP.route("/login", methods=["POST"])
 def login_route():
     body = request.get_json()
+    if "email" not in body or "password" not in body:
+        return {"msg": "Needs email and password in body"}
     response = login(body)
     return response
 
@@ -50,6 +57,8 @@ def login_route():
 @APP.route("/logout", methods=["POST"])
 def logout_route():
     body = request.get_json()
+    if "token" not in body or "email" not in body:
+        return {"msg": "Needs email and token in body"}
     response = logout(body)
     return response
 
@@ -58,15 +67,18 @@ def logout_route():
 def create_route():
     body = request.get_json()
     logging.error(body)
+    if "token" not in body or "invoice_data" not in body:
+        return {"msg": "Needs token and invoice_data"}
     response = persist_invoice(body["token"], body["invoice_data"])
     return json.dumps(response)
 
 
 @APP.route("/invoice/list", methods=["GET"])
 def list_invoices_route():
-    body = request.get_json()
-    logging.error(body)
-    response = list_invoices(body["token"])
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = list_invoices(token)
     return json.dumps(response)
 
 
