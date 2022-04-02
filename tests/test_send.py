@@ -14,7 +14,7 @@ INVALID_INPUT = 405
 #         return sample_invoice_file
 
 
-def test_successful_ubl(valid_invoice):
+def test_successful_ubl():
 
 
 
