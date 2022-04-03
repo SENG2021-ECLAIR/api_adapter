@@ -26,5 +26,5 @@ def test_successful_ubl():
         "file": open("tests/test_data/test_valid_response.xml")
     }
 
-    result = send_invoice(json.dumps(input, indent = 4) )
+    result = send_invoice(input)
     assert result.status_code == VALID
