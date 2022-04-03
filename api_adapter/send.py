@@ -11,7 +11,7 @@ import requests
 def send_invoice(input):
     
     url = "https://honeycomb-prod.herokuapp.com/send"
-    post_val = requests.post(url, json = input)
+    post_val = requests.post(url, files = input)
     return post_val
 
 # def send_invoice_sms(input):
