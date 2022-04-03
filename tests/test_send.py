@@ -99,4 +99,4 @@ def test_empty_file():
         "file": ""
     }
     result = send_invoice(input)
-    assert result.status_code == ACCESS_ERROR
+    assert result.status_code == UNAVALIABLE
