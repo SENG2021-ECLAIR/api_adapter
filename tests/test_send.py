@@ -88,7 +88,7 @@ def test_empty_email():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == UNAVALIABLE
+    assert result.status_code == ACCESS_ERROR
 
 def test_empty_file():
     input = {
@@ -99,4 +99,4 @@ def test_empty_file():
         "file": ""
     }
     result = send_invoice(input)
-    assert result.status_code == UNAVALIABLE
+    assert result.status_code == ACCESS_ERROR
