@@ -58,13 +58,11 @@ def login_user(email: str, password: str) -> str:
             return None, f"Password incorrect for {email}"
 
         logged_in = db["logged_in"]
+        logged_in_user = logged_in.find_one(query)
 
-        if (
-            logged_in.find_one(query) is not None
-            and logged_in.find_one(query)["email"] == email
-        ):
-            logging.error(f"{email} is already logged in")
-            return None, f"{email} is already logged in"
+        if logged_in_user is not None and logged_in_user["email"] == email:
+            existing_token = logged_in_user["token"]
+            return existing_token, f"{email} is now logged in"
 
         token = generate_token()
         logged_in.insert_one({"email": email, "token": token})
