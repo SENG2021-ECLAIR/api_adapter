@@ -8,7 +8,10 @@ from pytz import timezone
 
 
 def get_customer_name(invoice: str) -> str:
-    invoice_dict = xmltodict.parse(invoice)
+    try:
+        invoice_dict = xmltodict.parse(invoice)
+    except Exception:
+        return "NOT FOUND"
     customer_party = invoice_dict["Invoice"]["cac:AccountingCustomerParty"]
     try:
         name = customer_party["cac:Party"]["cac:PartyName"]["cbc:Name"]
