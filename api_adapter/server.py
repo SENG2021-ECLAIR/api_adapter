@@ -11,14 +11,16 @@ Endpoints that allows for the user to use the buttons:
 
 import json
 import logging
+
 from flask import Flask, request
-from api_adapter.send import send_invoice
 from flask_cors import CORS
-from api_adapter.auth import login, logout, signup
+
+from api_adapter.auth import login, logout, profile_color, signup
 from api_adapter.create import persist_invoice
 from api_adapter.database import db_cleanup
 from api_adapter.listing import list_invoices
 from api_adapter.render import get_render
+from api_adapter.send import send_invoice
 
 APP = Flask(__name__)
 CORS(APP)
@@ -61,6 +63,15 @@ def logout_route():
     if "token" not in body or "email" not in body:
         return {"msg": "Needs email and token in body"}
     response = logout(body)
+    return response
+
+
+@APP.route("/user/profile-color", method=["POST"])
+def user_profile_color_route():
+    body = request.get_json()
+    if "email" not in body:
+        return {"msg": "Needs email in body"}
+    response = profile_color(body)
     return response
 
 

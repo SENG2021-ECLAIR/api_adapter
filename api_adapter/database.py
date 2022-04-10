@@ -1,4 +1,5 @@
 import logging
+import random
 import sys
 from datetime import datetime
 from typing import Optional, Tuple
@@ -135,6 +136,24 @@ def get_invoices(token: str) -> Tuple[list, str]:
         user["invoices"],
         f"Successfully retreived invoices for {logged_in_user['email']}",
     )
+
+
+def get_user_profile_color(email: str):
+    db = connect_to_db()
+    users = db["users"]
+
+    query = {"email": email}
+    user = users.find_one(query)
+
+    try:
+        hex_color = user["hex_color"]
+    except Exception:
+        random_number = random.randint(0, 16777215)
+        hex_number = str(hex(random_number))
+        hex_color = "#" + hex_number[2:]
+        users.update_one(query, {"$set": {"hex_color": str(hex_color)}})
+
+    return hex_color
 
 
 def db_cleanup() -> int:

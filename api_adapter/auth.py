@@ -8,7 +8,13 @@ Functionality that allows for the user to:
 import logging
 import re
 
-from api_adapter.database import get_user, login_user, logout_user, register_user
+from api_adapter.database import (
+    get_user,
+    get_user_profile_color,
+    login_user,
+    logout_user,
+    register_user,
+)
 from api_adapter.helpers import encrypt_password
 
 
@@ -134,3 +140,15 @@ def valid_name(name: str) -> bool:
     Validates name given
     """
     return len(name) >= 1
+
+
+def profile_color(data: dict) -> dict:
+    """
+    Gets the user profile color
+    """
+    color = get_user_profile_color(data["email"])
+    return {"color": color}
+
+
+if __name__ == "__main__":
+    print(profile_color({"email": "jb@gmail.com"}))
