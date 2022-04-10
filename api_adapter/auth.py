@@ -148,7 +148,3 @@ def profile_color(data: dict) -> dict:
     """
     color = get_user_profile_color(data["email"])
     return {"color": color}
-
-
-if __name__ == "__main__":
-    print(profile_color({"email": "jb@gmail.com"}))
