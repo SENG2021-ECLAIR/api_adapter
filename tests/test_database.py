@@ -125,10 +125,9 @@ def test_login_user_already_logged_in(db):
     token1, msg1 = login_user(test_user_data["email"], test_user_data["password"])
     logged_in_user = logged_in.find_one(query)
 
-    assert token1 is None
-    assert msg1 == f"{test_user_data['email']} is already logged in"
-    assert logged_in_user["token"] != token1
-    assert logged_in_user["token"] == token0
+    assert token1 is not None
+    assert msg1 == f"{test_user_data['email']} is now logged in"
+    assert token0 == token1
     assert logged_in_user["email"] == test_user_data["email"]
     cleanup(db, test_user_data["email"])
 
