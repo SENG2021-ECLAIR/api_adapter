@@ -15,7 +15,7 @@ import logging
 from flask import Flask, request
 from flask_cors import CORS
 
-from api_adapter.auth import login, logout, profile_color, signup
+from api_adapter.auth import login, logout, profile_details, signup
 from api_adapter.create import persist_invoice
 from api_adapter.database import db_cleanup
 from api_adapter.listing import list_invoices
@@ -66,12 +66,12 @@ def logout_route():
     return response
 
 
-@APP.route("/user/profile-color", method=["POST"])
-def user_profile_color_route():
+@APP.route("/user/details", method=["POST"])
+def user_details():
     body = request.get_json()
     if "email" not in body:
         return {"msg": "Needs email in body"}
-    response = profile_color(body)
+    response = profile_details(body)
     return response
 
 

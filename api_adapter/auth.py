@@ -10,6 +10,7 @@ import re
 
 from api_adapter.database import (
     get_user,
+    get_user_first_last_name,
     get_user_profile_color,
     login_user,
     logout_user,
@@ -142,9 +143,11 @@ def valid_name(name: str) -> bool:
     return len(name) >= 1
 
 
-def profile_color(data: dict) -> dict:
+def profile_details(data: dict) -> dict:
     """
-    Gets the user profile color
+    Gets the user firstname, lastname, and randomly generated profile color
     """
     color = get_user_profile_color(data["email"])
-    return {"color": color}
+    firstname, lastname = get_user_first_last_name(data["email"])
+
+    return {"color": color, "firstname": firstname, "lastname": lastname}

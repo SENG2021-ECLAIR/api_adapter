@@ -138,7 +138,7 @@ def get_invoices(token: str) -> Tuple[list, str]:
     )
 
 
-def get_user_profile_color(email: str):
+def get_user_profile_color(email: str) -> str:
     db = connect_to_db()
     users = db["users"]
 
@@ -154,6 +154,16 @@ def get_user_profile_color(email: str):
         users.update_one(query, {"$set": {"hex_color": str(hex_color)}})
 
     return hex_color
+
+
+def get_user_first_last_name(email: str) -> Tuple[str]:
+    db = connect_to_db()
+    users = db["users"]
+
+    query = {"email": email}
+    user = users.find_one(query)
+
+    return (user["firstname"], user["lastname"])
 
 
 def db_cleanup() -> int:
