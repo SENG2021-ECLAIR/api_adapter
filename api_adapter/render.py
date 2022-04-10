@@ -14,11 +14,15 @@ def get_render(input):
     post_val = requests.post(upload_url, files=data)
     print(post_val)
 
+    assert post_val.status_code == 200
     if post_val.status_code == 200:
         download_url = f"{RENDER_BASE_URL}download?file_id={post_val.json()['file_id']}&file_type=HTML"
         response = requests.get(download_url)
         return {"msg": "Rendered", "html": response.text}
     return {"msg": "Error rendering"}
+
+
+
 # def save_invoice_locally(invoice_contents):
 #     directory = "invoices/"
 #     filename = "invoice.xml"
