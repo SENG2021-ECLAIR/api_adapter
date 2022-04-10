@@ -1,12 +1,11 @@
 import logging
 import sys
-from datetime import datetime
 from typing import Optional, Tuple
 
 from pymongo import MongoClient
 
 from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY
-from api_adapter.helpers import generate_token
+from api_adapter.helpers import generate_token, get_customer_name, get_time
 
 
 def connect_to_db():
@@ -108,9 +107,11 @@ def store_invoice(token: str, invoice: str) -> str:
     users = db["users"]
     users_query = {"email": logged_in_user["email"]}
 
+    customer_name = get_customer_name(invoice)
+
     invoice_data = {
-        "customer_name": "Some Customer",
-        "timestamp": datetime.now().strftime("%d/%m/%Y, %H:%M:%S"),
+        "customer_name": customer_name,
+        "timestamp": get_time(),
         "size": sys.getsizeof(invoice),
         "content": invoice,
     }
