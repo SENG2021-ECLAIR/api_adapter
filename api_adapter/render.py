@@ -10,7 +10,7 @@ def get_render(input):
     data = {
         "file": input["file"]
     }
-    upload_url = f"{RENDER_BASE_URL}upload"
+    upload_url = "e-invoice-rendering-brownie.herokuapp.com/invoice/rendering/upload"
     post_val = requests.post(upload_url, files=data)
     print(post_val)
 
