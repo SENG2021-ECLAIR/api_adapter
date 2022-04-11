@@ -19,7 +19,7 @@ def persist_invoice(token: str, invoice_details: dict) -> dict:
     response = create_invoice(invoice_details)
     if response is None:
         return {"msg": "Could not create and save invoice."}
-    msg = store_invoice(token, response.text)
+    msg = store_invoice(token, response.text, "created")
     return {"msg": msg}
 
 

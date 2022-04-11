@@ -93,7 +93,7 @@ def logout_user(email: str, token: str) -> str:
     return f"Successfully logged out {email}"
 
 
-def store_invoice(token: str, invoice: str) -> str:
+def store_invoice(token: str, invoice: str, method: str) -> str:
     db = connect_to_db()
     logged_in = db["logged_in"]
     logged_in_query = {"token": token}
@@ -113,6 +113,7 @@ def store_invoice(token: str, invoice: str) -> str:
         "timestamp": get_time(),
         "size": sys.getsizeof(invoice),
         "content": invoice,
+        "method": method,
     }
 
     users.update_one(users_query, {"$push": {"invoices": invoice_data}})
@@ -132,9 +133,15 @@ def get_invoices(token: str) -> Tuple[list, str]:
     users_query = {"email": logged_in_user["email"]}
 
     user = users.find_one(users_query)
-    print(user["invoices"])
+    created = []
+    received = []
+    for invoice in user["invoices"]:
+        if invoice["method"] == "created":
+            created.append(invoice)
+        elif invoice["method"] == "received":
+            received.append(invoice)
     return (
-        user["invoices"],
+        {"created": created, "received": received},
         f"Successfully retreived invoices for {logged_in_user['email']}",
     )
 

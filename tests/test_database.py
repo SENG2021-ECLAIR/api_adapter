@@ -197,7 +197,7 @@ def test_store_invoice(db):
 
     assert user["invoices"] == []
 
-    msg = store_invoice(token, "somestring")
+    msg = store_invoice(token, "somestring", "created")
     user = users.find_one(query)
 
     assert (
@@ -205,8 +205,9 @@ def test_store_invoice(db):
     )
     assert len(user["invoices"]) == 1
     assert user["invoices"][0]["content"] == "somestring"
+    assert user["invoices"][0]["method"] == "created"
 
-    msg = store_invoice(token, "some other string")
+    msg = store_invoice(token, "some other string", "received")
     user = users.find_one(query)
 
     assert (
@@ -214,3 +215,4 @@ def test_store_invoice(db):
     )
     assert len(user["invoices"]) == 2
     assert user["invoices"][1]["content"] == "some other string"
+    assert user["invoices"][1]["method"] == "received"
