@@ -200,19 +200,15 @@ def test_store_invoice(db):
     msg = store_invoice(token, "somestring", "created")
     user = users.find_one(query)
 
-    assert (
-        msg == f"Successfully created and stored invoice for {test_user_data['email']}"
-    )
+    assert msg == f"Successfully stored invoice for {test_user_data['email']}"
     assert len(user["invoices"]) == 1
     assert user["invoices"][0]["content"] == "somestring"
     assert user["invoices"][0]["method"] == "created"
 
-    msg = store_invoice(token, "some other string", "received")
+    msg = store_invoice(token, "some other string", "received", "received_timestamp")
     user = users.find_one(query)
 
-    assert (
-        msg == f"Successfully created and stored invoice for {test_user_data['email']}"
-    )
+    assert msg == f"Successfully stored invoice for {test_user_data['email']}"
     assert len(user["invoices"]) == 2
     assert user["invoices"][1]["content"] == "some other string"
     assert user["invoices"][1]["method"] == "received"

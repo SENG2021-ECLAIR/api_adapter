@@ -107,7 +107,7 @@ def logout_user(email: str, token: str) -> str:
 
 
 def store_invoice(
-    token: str, invoice: str, method: str, received_timestamp: str
+    token: str, invoice: str, method: str, received_timestamp: str = ""
 ) -> str:
     db = connect_to_db()
     logged_in = db["logged_in"]
