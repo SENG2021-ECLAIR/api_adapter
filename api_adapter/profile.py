@@ -31,53 +31,53 @@ def profile_details(data: dict) -> dict:
     return {"color": color, "firstname": firstname, "lastname": lastname}
 
 
-def update_profile_colour(credentials: dict, new_color: str) -> str:
+def update_profile_colour(data: dict) -> str:
     """
     Updates profile colour for user if valid
         Parameters:
-            credentials: dict = {
+            data: dict = {
                 "email": string
+                "new_color": string
             }
-            "new_color": string
 
         Returns:
             data: dict = {
                 "message": string,
             }
     """
-    if not valid_email(credentials["email"]):
-        return {"msg": f"{credentials['email']} is not a valid email"}
+    if not valid_email(data["email"]):
+        return {"msg": f"{data['email']} is not a valid email"}
 
-    msg = update_user_profile_color(credentials["email"], new_color)
+    msg = update_user_profile_color(data["email"], data["new_color"])
     return {"msg": msg}
 
 
-def update_profile_firstname(credentials: dict, new_firstname: str) -> str:
+def update_profile_firstname(data: dict) -> str:
     """
     Updates profile colour for user if valid
         Parameters:
-            credentials: dict = {
+            data: dict = {
                 "email": string
+                "new_firstname": string
             }
-            "new_firstname": string
 
         Returns:
             data: dict = {
                 "message": string,
             }
     """
-    if not valid_email(credentials["email"]):
-        return {"msg": f"{credentials['email']} is not a valid email"}
+    if not valid_email(data["email"]):
+        return {"msg": f"{data['email']} is not a valid email"}
 
-    msg = update_user_profile_firstname(credentials["email"], new_firstname)
+    msg = update_user_profile_firstname(data["email"], data["new_firstname"])
     return {"msg": msg}
 
 
-def update_profile_lastname(credentials: dict, new_lastname: str) -> str:
+def update_profile_lastname(data: dict) -> str:
     """
     Updates profile colour for user if valid
         Parameters:
-            credentials: dict = {
+            data: dict = {
                 "email": string
             }
             "new_lastname": string
@@ -87,10 +87,10 @@ def update_profile_lastname(credentials: dict, new_lastname: str) -> str:
                 "message": string,
             }
     """
-    if not valid_email(credentials["email"]):
-        return {"msg": f"{credentials['email']} is not a valid email"}
+    if not valid_email(data["email"]):
+        return {"msg": f"{data['email']} is not a valid email"}
 
-    msg = update_user_profile_lastname(credentials["email"], new_lastname)
+    msg = update_user_profile_lastname(data["email"], data["new_lastname"])
     return {"msg": msg}
 
 
