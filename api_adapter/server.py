@@ -73,7 +73,7 @@ def logout_route():
     return response
 
 
-@APP.route("/user/details", method=["POST"])
+@APP.route("/user/details", methods=["POST"])
 def user_details_route():
     body = request.get_json()
     if "email" not in body:
@@ -82,7 +82,7 @@ def user_details_route():
     return response
 
 
-@APP.route("/user/update/color", method=["POST"])
+@APP.route("/user/update/color", methods=["POST"])
 def update_color_route():
     body = request.get_json()
     if "email" not in body:
@@ -91,7 +91,7 @@ def update_color_route():
     return response
 
 
-@APP.route("/user/update/firstname", method=["POST"])
+@APP.route("/user/update/firstname", methods=["POST"])
 def update_firstname_route():
     body = request.get_json()
     if "email" not in body:
@@ -100,7 +100,7 @@ def update_firstname_route():
     return response
 
 
-@APP.route("/user/update/lastname", method=["POST"])
+@APP.route("/user/update/lastname", methods=["POST"])
 def update_lastname_route():
     body = request.get_json()
     if "email" not in body:
@@ -109,7 +109,7 @@ def update_lastname_route():
     return response
 
 
-@APP.route("/user/update/password", method=["POST"])
+@APP.route("/user/update/password", methods=["POST"])
 def update_password_route():
     body = request.get_json()
     if "password" not in body or "new_password" not in body:
