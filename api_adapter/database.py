@@ -179,7 +179,10 @@ def get_user_first_last_name(email: str) -> Tuple[str]:
     query = {"email": email}
     user = users.find_one(query)
 
-    return (user["firstname"], user["lastname"])
+    if user is None:
+        return ("", "")
+
+    return ("Valid email", user["firstname"], user["lastname"])
 
 
 def update_user_password(email: str, password: str, new_password: str) -> str:

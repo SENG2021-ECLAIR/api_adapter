@@ -75,7 +75,7 @@ def user_details_route():
     return response
 
 
-@APP.route("/user/forgot-password", method=["POST"])
+@APP.route("/user/reset-password", method=["POST"])
 def reset_password_route():
     body = request.get_json()
     if "password" not in body or "new_password" not in body:

@@ -185,7 +185,12 @@ def reset_password(credentials: dict) -> str:
         return {"msg": f"{credentials['email']} is not a valid email"}
 
     encrypted_password = encrypt_password(credentials["password"])
-    encrypted_new_password = encrypt_password(credentials["password"])
+    encrypted_new_password = encrypt_password(credentials["new_password"])
+
+    if not valid_password(credentials["new_password"]):
+        return {
+            "msg": "Password needs to contain at least 6 characters, 1 capital letter, 1 lowercase letter and 1 number"
+        }
 
     msg = update_user_password(
         credentials["email"], encrypted_password, encrypted_new_password
