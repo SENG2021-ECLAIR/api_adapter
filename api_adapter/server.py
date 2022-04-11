@@ -19,7 +19,13 @@ from api_adapter.auth import login, logout, signup
 from api_adapter.create import persist_invoice
 from api_adapter.database import db_cleanup
 from api_adapter.listing import list_invoices
-from api_adapter.profile import profile_details, reset_password, update_profile_colour
+from api_adapter.profile import (
+    profile_details,
+    reset_password,
+    update_profile_colour,
+    update_profile_firstname,
+    update_profile_lastname,
+)
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
 
@@ -90,8 +96,8 @@ def update_firstname_route():
     body = request.get_json()
     if "email" not in body:
         return {"msg": "Needs email in body"}
-    # response = profile_details(body)
-    # return response
+    response = update_profile_firstname(body)
+    return response
 
 
 @APP.route("/user/update/lastname")
@@ -99,8 +105,8 @@ def update_lastname_route():
     body = request.get_json()
     if "email" not in body:
         return {"msg": "Needs email in body"}
-    # response = profile_details(body)
-    # return response
+    response = update_profile_lastname(body)
+    return response
 
 
 @APP.route("/user/update/password", method=["POST"])

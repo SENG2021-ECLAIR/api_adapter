@@ -200,6 +200,36 @@ def update_user_profile_color(email: str, new_color: str) -> str:
     return f"{email} is not a registered user"
 
 
+def update_user_profile_firstname(email: str, new_firstname: str) -> str:
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+
+    user = users.find_one(query)
+
+    if user is not None:
+        users.update_one(query, {"$set": {"firstname": new_firstname}})
+        return f"firstname successfully updated for ${email}"
+
+    logging.error(f"{email} is not a registered user")
+    return f"{email} is not a registered user"
+
+
+def update_user_profile_lastname(email: str, new_lastname: str) -> str:
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+
+    user = users.find_one(query)
+
+    if user is not None:
+        users.update_one(query, {"$set": {"lastname": new_lastname}})
+        return f"lastname successfully updated for ${email}"
+
+    logging.error(f"{email} is not a registered user")
+    return f"{email} is not a registered user"
+
+
 def update_user_password(email: str, password: str, new_password: str) -> str:
     db = connect_to_db()
     users = db["users"]

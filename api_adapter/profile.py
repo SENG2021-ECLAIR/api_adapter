@@ -4,6 +4,8 @@ from api_adapter.database import (
     get_user_profile_color,
     update_user_password,
     update_user_profile_color,
+    update_user_profile_firstname,
+    update_user_profile_lastname,
 )
 from api_adapter.helpers import encrypt_password
 
@@ -31,7 +33,7 @@ def profile_details(data: dict) -> dict:
 
 def update_profile_colour(credentials: dict, new_color: str) -> str:
     """
-    Updates password of user if valid, and current password matches
+    Updates profile colour for user if valid
         Parameters:
             credentials: dict = {
                 "email": string
@@ -47,6 +49,48 @@ def update_profile_colour(credentials: dict, new_color: str) -> str:
         return {"msg": f"{credentials['email']} is not a valid email"}
 
     msg = update_user_profile_color(credentials["email"], new_color)
+    return {"msg": msg}
+
+
+def update_profile_firstname(credentials: dict, new_firstname: str) -> str:
+    """
+    Updates profile colour for user if valid
+        Parameters:
+            credentials: dict = {
+                "email": string
+            }
+            "new_firstname": string
+
+        Returns:
+            data: dict = {
+                "message": string,
+            }
+    """
+    if not valid_email(credentials["email"]):
+        return {"msg": f"{credentials['email']} is not a valid email"}
+
+    msg = update_user_profile_firstname(credentials["email"], new_firstname)
+    return {"msg": msg}
+
+
+def update_profile_lastname(credentials: dict, new_lastname: str) -> str:
+    """
+    Updates profile colour for user if valid
+        Parameters:
+            credentials: dict = {
+                "email": string
+            }
+            "new_lastname": string
+
+        Returns:
+            data: dict = {
+                "message": string,
+            }
+    """
+    if not valid_email(credentials["email"]):
+        return {"msg": f"{credentials['email']} is not a valid email"}
+
+    msg = update_user_profile_lastname(credentials["email"], new_lastname)
     return {"msg": msg}
 
 
@@ -82,9 +126,3 @@ def reset_password(credentials: dict) -> str:
     )
 
     return {"msg": msg}
-
-
-if __name__ == "__main__":
-    print(profile_details({"email": "jb@gmail.com"}))
-    print(update_profile_colour({"email": "jb@gmail.com"}, "#D8F793"))
-    print(profile_details({"email": "jb@gmail.com"}))
