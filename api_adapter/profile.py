@@ -79,8 +79,8 @@ def update_profile_lastname(data: dict) -> str:
         Parameters:
             data: dict = {
                 "email": string
+                "new_lastname": string
             }
-            "new_lastname": string
 
         Returns:
             data: dict = {
