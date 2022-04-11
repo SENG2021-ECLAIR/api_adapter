@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 from pymongo import MongoClient
 
-from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY
+from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY, hex_colors
 from api_adapter.helpers import generate_token, get_customer_name, get_time
 
 
@@ -24,6 +24,19 @@ def get_user(email: str) -> Optional[dict]:
     db = connect_to_db()
     users = db["users"]
     return users.find_one({"email": email})
+
+
+def get_email_from_token(token: str) -> str:
+    """
+    Given a token return that users email
+    """
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    logged_in_query = {"token": token}
+    user = logged_in.find_one(logged_in_query)
+    if user is None:
+        return "Invalid token"
+    return user["email"]
 
 
 def register_user(user_data: dict) -> str:
@@ -144,24 +157,6 @@ def get_invoices(token: str) -> Tuple[list, str]:
         {"created": created, "received": received},
         f"Successfully retreived invoices for {logged_in_user['email']}",
     )
-
-
-hex_colors = [
-    "#2292A4",
-    "#D96C06",
-    "#BDBF09",
-    "#613DC1",
-    "#9B5094",
-    "#BB4430",
-    "#645DD7",
-    "#054A91",
-    "#447604",
-    "#9A275A",
-    "#0CA4A5",
-    "#EDB230",
-    "#EE2E31",
-    "#D8F793",
-]
 
 
 def get_user_profile_color(email: str) -> str:
