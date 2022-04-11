@@ -113,7 +113,7 @@ def store_invoice(token: str, invoice: str, method: str) -> str:
         "timestamp": get_time(),
         "size": sys.getsizeof(invoice),
         "content": invoice,
-        "method": method
+        "method": method,
     }
 
     users.update_one(users_query, {"$push": {"invoices": invoice_data}})
