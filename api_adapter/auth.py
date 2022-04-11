@@ -100,7 +100,7 @@ def logout(data: dict) -> dict:
 
         Returns:
             response: dict = {
-                "msg": string
+                "message": string
             }
     """
     msg = logout_user(data["email"], data["token"])
