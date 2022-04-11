@@ -82,7 +82,7 @@ def user_details_route():
     return response
 
 
-@APP.route("/user/update/color")
+@APP.route("/user/update/color", method=["POST"])
 def update_color_route():
     body = request.get_json()
     if "email" not in body:
@@ -91,7 +91,7 @@ def update_color_route():
     return response
 
 
-@APP.route("/user/update/firstname")
+@APP.route("/user/update/firstname", method=["POST"])
 def update_firstname_route():
     body = request.get_json()
     if "email" not in body:
@@ -100,7 +100,7 @@ def update_firstname_route():
     return response
 
 
-@APP.route("/user/update/lastname")
+@APP.route("/user/update/lastname", method=["POST"])
 def update_lastname_route():
     body = request.get_json()
     if "email" not in body:
