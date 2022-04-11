@@ -182,7 +182,22 @@ def get_user_first_last_name(email: str) -> Tuple[str]:
     if user is None:
         return ("", "")
 
-    return ("Valid email", user["firstname"], user["lastname"])
+    return ("valid email", user["firstname"], user["lastname"])
+
+
+def update_user_profile_color(email: str, new_color: str) -> str:
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+
+    user = users.find_one(query)
+
+    if user is not None:
+        users.update_one(query, {"$set": {"hex_color": new_color}})
+        return "profile colour successfully updated"
+
+    logging.error(f"{email} is not a registered user")
+    return f"{email} is not a registered user"
 
 
 def update_user_password(email: str, password: str, new_password: str) -> str:

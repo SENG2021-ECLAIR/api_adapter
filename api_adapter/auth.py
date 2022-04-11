@@ -8,15 +8,7 @@ Functionality that allows for the user to:
 import logging
 import re
 
-from api_adapter.database import (
-    get_user,
-    get_user_first_last_name,
-    get_user_profile_color,
-    login_user,
-    logout_user,
-    register_user,
-    update_user_password,
-)
+from api_adapter.database import get_user, login_user, logout_user, register_user
 from api_adapter.helpers import encrypt_password
 
 
@@ -142,58 +134,3 @@ def valid_name(name: str) -> bool:
     Validates name given
     """
     return len(name) >= 1
-
-
-def profile_details(data: dict) -> dict:
-    """
-    Gets the user firstname, lastname, and randomly generated profile color
-        Parameters:
-            credentials: dict = {
-                "email": string,
-            }
-
-        Returns:
-            data: dict = {
-                "color": string,
-                "firstname": string
-                "lastname": string
-            }
-    """
-    color = get_user_profile_color(data["email"])
-    firstname, lastname = get_user_first_last_name(data["email"])
-
-    return {"color": color, "firstname": firstname, "lastname": lastname}
-
-
-def reset_password(credentials: dict) -> str:
-    """
-    Updates password of user if valid, and current password matches
-        Parameters:
-            credentials: dict = {
-                "email": string,
-                "password": string,
-                "new_password": string
-            }
-
-        Returns:
-            data: dict = {
-                "message": string,
-            }
-    """
-
-    if not valid_email(credentials["email"]):
-        return {"msg": f"{credentials['email']} is not a valid email"}
-
-    encrypted_password = encrypt_password(credentials["password"])
-    encrypted_new_password = encrypt_password(credentials["new_password"])
-
-    if not valid_password(credentials["new_password"]):
-        return {
-            "msg": "Password needs to contain at least 6 characters, 1 capital letter, 1 lowercase letter and 1 number"
-        }
-
-    msg = update_user_password(
-        credentials["email"], encrypted_password, encrypted_new_password
-    )
-
-    return {"msg": msg}
