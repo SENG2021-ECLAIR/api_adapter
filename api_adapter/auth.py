@@ -15,6 +15,7 @@ from api_adapter.database import (
     login_user,
     logout_user,
     register_user,
+    update_user_password,
 )
 from api_adapter.helpers import encrypt_password
 
@@ -107,7 +108,7 @@ def logout(data: dict) -> dict:
 
         Returns:
             response: dict = {
-                "msg": string
+                "message": string
             }
     """
     msg = logout_user(data["email"], data["token"])
@@ -146,8 +147,48 @@ def valid_name(name: str) -> bool:
 def profile_details(data: dict) -> dict:
     """
     Gets the user firstname, lastname, and randomly generated profile color
+        Parameters:
+            credentials: dict = {
+                "email": string,
+            }
+
+        Returns:
+            data: dict = {
+                "color": string,
+                "firstname": string
+                "lastname": string
+            }
     """
     color = get_user_profile_color(data["email"])
     firstname, lastname = get_user_first_last_name(data["email"])
 
     return {"color": color, "firstname": firstname, "lastname": lastname}
+
+
+def reset_password(credentials: dict) -> str:
+    """
+    Updates password of user if valid, and current password matches
+        Parameters:
+            credentials: dict = {
+                "email": string,
+                "password": string,
+                "new_password": string
+            }
+
+        Returns:
+            data: dict = {
+                "message": string,
+            }
+    """
+
+    if not valid_email(credentials["email"]):
+        return {"msg": f"{credentials['email']} is not a valid email"}
+
+    encrypted_password = encrypt_password(credentials["password"])
+    encrypted_new_password = encrypt_password(credentials["password"])
+
+    msg = update_user_password(
+        credentials["email"], encrypted_password, encrypted_new_password
+    )
+
+    return {"msg": msg}

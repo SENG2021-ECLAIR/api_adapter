@@ -15,7 +15,7 @@ import logging
 from flask import Flask, request
 from flask_cors import CORS
 
-from api_adapter.auth import login, logout, profile_details, signup
+from api_adapter.auth import login, logout, profile_details, reset_password, signup
 from api_adapter.create import persist_invoice
 from api_adapter.database import db_cleanup
 from api_adapter.listing import list_invoices
@@ -67,11 +67,20 @@ def logout_route():
 
 
 @APP.route("/user/details", method=["POST"])
-def user_details():
+def user_details_route():
     body = request.get_json()
     if "email" not in body:
         return {"msg": "Needs email in body"}
     response = profile_details(body)
+    return response
+
+
+@APP.route("/user/forgot-password", method=["POST"])
+def reset_password_route():
+    body = request.get_json()
+    if "password" not in body or "new_password" not in body:
+        return {"msg": "Needs password in body"}
+    response = reset_password(body)
     return response
 
 
