@@ -106,7 +106,9 @@ def logout_user(email: str, token: str) -> str:
     return f"Successfully logged out {email}"
 
 
-def store_invoice(token: str, invoice: str, method: str) -> str:
+def store_invoice(
+    token: str, invoice: str, method: str, received_timestamp: str
+) -> str:
     db = connect_to_db()
     logged_in = db["logged_in"]
     logged_in_query = {"token": token}
@@ -129,8 +131,11 @@ def store_invoice(token: str, invoice: str, method: str) -> str:
         "method": method,
     }
 
+    if method == "received":
+        invoice_data["received_timestamp"] = received_timestamp
+
     users.update_one(users_query, {"$push": {"invoices": invoice_data}})
-    return f"Successfully created and stored invoice for {logged_in_user['email']}"
+    return f"Successfully stored invoice for {logged_in_user['email']}"
 
 
 def get_invoices(token: str) -> Tuple[list, str]:
