@@ -28,6 +28,7 @@ from api_adapter.profile import (
 )
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
+from api_adapter.render_json import form_json
 
 APP = Flask(__name__)
 CORS(APP)
@@ -147,10 +148,10 @@ def list_invoices_route():
 @APP.route("/invoice/render", methods=["GET"])
 def render_invoice_route():
     token = request.headers.get("token")
-    invoice_id = request.headers.get("invoice_id")
-    if token is None or invoice_id is None:
+    address = request.headers.get("ubl_address")
+    if token is None or address is None:
         return {"msg": "Needs token and invoice_id in headers"}
-    response = get_render(token, int(invoice_id))
+    response = form_json(address)
     return json.dumps(response)
 
 
