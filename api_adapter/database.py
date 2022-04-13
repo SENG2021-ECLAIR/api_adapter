@@ -397,17 +397,25 @@ def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
     return f"{invitee_email} successfully added to {team_name} as a{' ' + role if role == 'Member' else 'n ' + role}"
 
 
-def get_members_of(team_name: str, role: str = None) -> list:
+def is_member_of(team_name: str, token: str) -> bool:
+    user = get_user_from_token(token)
+    _, members = get_members_of(team_name)
+    if any(member["email"] == user["email"] for member in members):
+        return True
+    return False
+
+
+def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
     db = connect_to_db()
     teams = db["teams"]
     query = {"team_name": team_name}
     team = teams.find_one(query)
     if team is None:
         logging.error(f"{team_name} does not exist")
-        return f"{team_name} does not exist"
+        return f"{team_name} does not exist", []
 
     if role is None:
-        return team["members"]
+        return f"Successfully got list of members in {team_name}", team["members"]
 
     members = []
 
@@ -415,7 +423,7 @@ def get_members_of(team_name: str, role: str = None) -> list:
         if member["role"] == role:
             members.append(member)
 
-    return members
+    return f"Successfully got list of members in {team_name} with role {role}", members
 
 
 def db_cleanup() -> Tuple[int, int]:
