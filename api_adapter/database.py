@@ -316,7 +316,39 @@ def update_user_password(email: str, password: str, new_password: str) -> str:
     return f"{email} is not a registered user"
 
 
-def db_cleanup() -> int:
+def register_team(team_name: str, owner: dict) -> str:
+    db = connect_to_db()
+    teams = db["teams"]
+    query = {"team_name": team_name}
+    team = teams.find_one(query)
+    if team is not None:
+        logging.error(f"{team_name} is already a registered team")
+        return f"{team_name} is already a registered team"
+
+    user = get_user(owner["email"])
+
+    team = {
+        "team_name": team_name,
+        "time_created": get_time(),
+        "team_owner": owner,
+        "members": [],
+    }
+
+    owner = {
+        "firstname": user["firstname"],
+        "lastname": user["lastname"],
+        "email": user["email"],
+        "role": "Owner",
+        "time_joined": get_time(),
+    }
+
+    team["members"].append(owner)
+    teams.insert_one(team)
+
+    return f"{team_name} successfully created."
+
+
+def db_cleanup() -> Tuple[int, int]:
     db = connect_to_db()
     users = db["users"]
     logged_in = db["logged_in"]
