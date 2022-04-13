@@ -29,6 +29,7 @@ from api_adapter.profile import (
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
 from api_adapter.team import create_team
+from api_adapter.users import list_users
 
 APP = Flask(__name__)
 CORS(APP)
@@ -152,6 +153,16 @@ def render_invoice_route():
     if token is None or invoice_id is None:
         return {"msg": "Needs token and invoice_id in headers"}
     response = get_render(token, int(invoice_id))
+    return json.dumps(response)
+
+
+@APP.route("/users/list", methods=["GET"])
+def list_users_route():
+    token = request.headers.get("token")
+    if not check_logged_in_token(token):
+        return {"msg": "Invalid token"}
+    response = list_users()
+    print(response)
     return json.dumps(response)
 
 

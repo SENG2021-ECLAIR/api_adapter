@@ -52,6 +52,26 @@ def check_registered(email):
     return True if user is not None else False
 
 
+def get_list_users() -> dict:
+    """
+    List all registered users in the database
+    """
+    db = connect_to_db()
+    users = db["users"]
+    users_list = list(users.find({}))
+    response = {"users": []}
+    for user in users_list:
+        response["users"].append(
+            {
+                "email": user["email"],
+                "firstname": user["firstname"],
+                "lastname": user["lastname"],
+                "num_invoices": len(user["invoices"]),
+            }
+        )
+    return response
+
+
 def check_logged_in_email(email: str = None):
     """
     Given an email, check if it belongs to a logged in user
