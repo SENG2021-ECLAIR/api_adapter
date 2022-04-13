@@ -26,6 +26,44 @@ def get_user(email: str) -> Optional[dict]:
     return users.find_one({"email": email})
 
 
+def check_registered(email):
+    if email is None:
+        return False
+
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+    user = users.find_one(query)
+
+    return True if user is not None else False
+
+
+def check_logged_in_email(email: str = None):
+    if email is None:
+        return False
+
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    query = {"email": email}
+    user = logged_in.find_one(query)
+
+    return True if user is not None else False
+
+
+def check_logged_in_token(
+    token: str = None,
+):
+    if token is None:
+        return False
+
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    query = {"token": token}
+    user = logged_in.find_one(query)
+
+    return True if user is not None else False
+
+
 def register_user(user_data: dict) -> str:
     """
     Creates document in db containing users information including hashed password, returning a generated token
