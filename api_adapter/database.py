@@ -353,6 +353,7 @@ def register_team(team_name: str, owner: dict) -> str:
         "email": user["email"],
         "role": "Owner",
         "time_joined": get_time(),
+        "hex_color": user["hex_color"],
     }
 
     team = {
