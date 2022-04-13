@@ -26,7 +26,21 @@ def get_user(email: str) -> Optional[dict]:
     return users.find_one({"email": email})
 
 
+def get_user_from_token(token: str) -> dict:
+    """
+    Given a token return a user
+    """
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    query = {"token": token}
+    user = logged_in.find_one(query)
+    return user
+
+
 def check_registered(email):
+    """
+    Given an email, check if it belongs to a registered user
+    """
     if email is None:
         return False
 
@@ -39,6 +53,9 @@ def check_registered(email):
 
 
 def check_logged_in_email(email: str = None):
+    """
+    Given an email, check if it belongs to a logged in user
+    """
     if email is None:
         return False
 
@@ -53,6 +70,9 @@ def check_logged_in_email(email: str = None):
 def check_logged_in_token(
     token: str = None,
 ):
+    """
+    Given a token, check if it belongs to a logged in user
+    """
     if token is None:
         return False
 
