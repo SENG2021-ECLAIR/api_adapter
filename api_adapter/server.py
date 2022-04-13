@@ -28,7 +28,7 @@ from api_adapter.profile import (
 )
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
-from api_adapter.team import create_team
+from api_adapter.team import create_team, invite_member
 from api_adapter.users import list_users
 
 APP = Flask(__name__)
@@ -175,6 +175,26 @@ def team_create_route():
     if "team_name" not in body:
         return {"msg": "Needs team_name in the body."}
     response = create_team(token, body["team_name"])
+    return response
+
+
+@APP.route("/team/invite", methods=["POST"])
+def team_invite_route():
+    token = request.headers.get("token")
+    if not check_logged_in_token(token):
+        return {"msg": "Invalid token"}
+    body = request.get_json()
+    role = "Member"
+    if "team_name" not in body:
+        return {"msg": "Needs team_name in the body."}
+    elif "invitee_email" not in body:
+        return {"msg": "Needs invitee_email in the body."}
+    elif "role" in body:
+        role = body["role"]
+
+    response = invite_member(body["team_name"], body["invitee_email"], role)
+
+    logging.info(response)
     return response
 
 

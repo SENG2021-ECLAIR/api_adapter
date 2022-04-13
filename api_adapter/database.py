@@ -368,6 +368,56 @@ def register_team(team_name: str, owner: dict) -> str:
     return f"{team_name} successfully created."
 
 
+def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
+    db = connect_to_db()
+    teams = db["teams"]
+    query = {"team_name": team_name}
+    team = teams.find_one(query)
+    if team is None:
+        logging.error(f"{team_name} does not exist")
+        return f"{team_name} does not exist"
+
+    user = get_user(invitee_email)
+    if user is None:
+        logging.error(f"{invitee_email} does not exist")
+        return f"{invitee_email} does not exist"
+
+    if any(member["email"] == invitee_email for member in team["members"]):
+        logging.error(f"{invitee_email} is already in this team")
+        return f"{invitee_email} is already in this team"
+
+    member = {
+        "firstname": user["firstname"],
+        "lastname": user["lastname"],
+        "email": user["email"],
+        "role": role,
+        "time_joined": get_time(),
+    }
+    teams.update_one(query, {"$push": {"members": member}})
+    return f"{invitee_email} successfully added to {team_name} as a{' ' + role if role == 'Member' else 'n ' + role}"
+
+
+def get_members_of(team_name: str, role: str = None) -> list:
+    db = connect_to_db()
+    teams = db["teams"]
+    query = {"team_name": team_name}
+    team = teams.find_one(query)
+    if team is None:
+        logging.error(f"{team_name} does not exist")
+        return f"{team_name} does not exist"
+
+    if role is None:
+        return team["members"]
+
+    members = []
+
+    for member in team["members"]:
+        if member["role"] == role:
+            members.append(member)
+
+    return members
+
+
 def db_cleanup() -> Tuple[int, int]:
     db = connect_to_db()
     users = db["users"]
