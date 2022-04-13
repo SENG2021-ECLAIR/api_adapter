@@ -393,6 +393,7 @@ def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
         "email": user["email"],
         "role": role,
         "time_joined": get_time(),
+        "hex_color": user["hex_color"],
     }
     teams.update_one(query, {"$push": {"members": member}})
     return f"{invitee_email} successfully added to {team_name} as a{' ' + role if role == 'Member' else 'n ' + role}"
