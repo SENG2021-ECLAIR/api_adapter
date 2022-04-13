@@ -327,19 +327,19 @@ def register_team(team_name: str, owner: dict) -> str:
 
     user = get_user(owner["email"])
 
-    team = {
-        "team_name": team_name,
-        "time_created": get_time(),
-        "team_owner": owner,
-        "members": [],
-    }
-
     owner = {
         "firstname": user["firstname"],
         "lastname": user["lastname"],
         "email": user["email"],
         "role": "Owner",
         "time_joined": get_time(),
+    }
+
+    team = {
+        "team_name": team_name,
+        "time_created": get_time(),
+        "team_owner": owner,
+        "members": [],
     }
 
     team["members"].append(owner)
