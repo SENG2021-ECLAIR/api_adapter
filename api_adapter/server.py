@@ -17,7 +17,7 @@ from flask_cors import CORS
 
 from api_adapter.auth import login, logout, signup
 from api_adapter.create import persist_invoice
-from api_adapter.database import db_cleanup
+from api_adapter.database import check_logged_in_token, db_cleanup
 from api_adapter.listing import list_invoices
 from api_adapter.profile import (
     profile_details,
@@ -28,6 +28,7 @@ from api_adapter.profile import (
 )
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
+from api_adapter.team import create_team
 
 APP = Flask(__name__)
 CORS(APP)
@@ -73,7 +74,7 @@ def logout_route():
     return response
 
 
-@APP.route("/user/details", method=["POST"])
+@APP.route("/user/details", methods=["POST"])
 def user_details_route():
     body = request.get_json()
     if "email" not in body:
@@ -82,7 +83,7 @@ def user_details_route():
     return response
 
 
-@APP.route("/user/update/color", method=["POST"])
+@APP.route("/user/update/color", methods=["POST"])
 def update_color_route():
     body = request.get_json()
     if "email" not in body:
@@ -91,7 +92,7 @@ def update_color_route():
     return response
 
 
-@APP.route("/user/update/firstname", method=["POST"])
+@APP.route("/user/update/firstname", methods=["POST"])
 def update_firstname_route():
     body = request.get_json()
     if "email" not in body:
@@ -100,7 +101,7 @@ def update_firstname_route():
     return response
 
 
-@APP.route("/user/update/lastname", method=["POST"])
+@APP.route("/user/update/lastname", methods=["POST"])
 def update_lastname_route():
     body = request.get_json()
     if "email" not in body:
@@ -109,7 +110,7 @@ def update_lastname_route():
     return response
 
 
-@APP.route("/user/update/password", method=["POST"])
+@APP.route("/user/update/password", methods=["POST"])
 def update_password_route():
     body = request.get_json()
     if "password" not in body or "new_password" not in body:
@@ -152,6 +153,24 @@ def render_invoice_route():
         return {"msg": "Needs token and invoice_id in headers"}
     response = get_render(token, int(invoice_id))
     return json.dumps(response)
+
+
+@APP.route("/team/create", methods=["POST"])
+def team_create_route():
+    token = request.headers.get("token")
+    if not check_logged_in_token(token):
+        return {"msg": "Invalid token"}
+    body = request.get_json()
+    if "team_name" not in body:
+        return {"msg": "Needs team_name in the body."}
+    response = create_team(token, body["team_name"])
+    return response
+
+
+@APP.route("/test", methods=["POST"])
+def test_route():
+    body = request.get_json()
+    return body
 
 
 @APP.route("/cleanup", methods=["POST"])
