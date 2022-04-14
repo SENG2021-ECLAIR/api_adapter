@@ -6,6 +6,11 @@ from api_adapter.constants import RENDER_BASE_URL
 from api_adapter.database import get_invoices
 
 
+def get_invoice_contents(token, id):
+    invoices, msg = get_invoices(token)
+    return invoices["created"][id]["content"] + invoices["received"][id]["content"]
+
+
 def save_invoice_locally(invoice_contents):
     directory = "invoices/"
     filename = "invoice.xml"
@@ -24,26 +29,14 @@ def get_render(token: str, invoice_id: int) -> dict:
     upload_url = f"{RENDER_BASE_URL}upload"
 
     file_path = save_invoice_locally(invoice_contents)
-    files = {
-        "file": ("invoice.xml", open(file_path, "rb"), "text/xml"),
-    }
-    headers = {
-        "Content-Disposition": 'form-data; name="file"; filename="'
-        + "invoice.xml"
-        + '"',
-        "Content-Type": "text/xml",
-    }
-    res = requests.post(upload_url, files=files, headers=headers)
+    files = {"file": open(file_path, "rb")}
+    res = requests.post(upload_url, files=files)
     print(res.text)
     if res.ok:
-        download_url = (
-            f"{RENDER_BASE_URL}download?file_id={res.json()['file_id']}&file_type=HTML"
-        )
+        file_id = res.json()["file_ids"][0]
+        print(file_id)
+        download_url = f"{RENDER_BASE_URL}download?file_id={file_id}&file_type=HTML"
         response = requests.get(download_url)
-        return {"msg": "RENDERED", "html": response.text}
-    return {"msg": "Error rendering"}
-
-
-def get_invoice_contents(token, id):
-    invoices, msg = get_invoices(token)
-    return invoices[id]["content"]
+        print(response.text)
+        return {"msg": "Successfully rendered invoice as html", "html": response.text}
+    return {"msg": "Error rendering invoice"}
