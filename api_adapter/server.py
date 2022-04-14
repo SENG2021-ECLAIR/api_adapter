@@ -203,11 +203,7 @@ def team_members_route():
     token = request.headers.get("token")
     if not check_logged_in_token(token):
         return {"msg": "Invalid token"}
-    body = request.get_json()
-    role = None
-    if "role" in body:
-        role = body["role"]
-
+    role = request.args.get("role")
     response = list_team_members(token, role)
 
     logging.info(response)

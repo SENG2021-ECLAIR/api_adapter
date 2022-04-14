@@ -34,6 +34,9 @@ def get_user_from_token(token: str) -> dict:
     logged_in = db["logged_in"]
     query = {"token": token}
     user = logged_in.find_one(query)
+    users_collection = db["users"]
+    query = {"email": user["email"]}
+    user = users_collection.find_one(query)
     return user
 
 
