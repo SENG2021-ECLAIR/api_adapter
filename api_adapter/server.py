@@ -205,12 +205,10 @@ def team_members_route():
         return {"msg": "Invalid token"}
     body = request.get_json()
     role = None
-    if "team_name" not in body:
-        return {"msg": "Needs team_name in the body."}
-    elif "role" in body:
+    if "role" in body:
         role = body["role"]
 
-    response = list_team_members(token, body["team_name"], role)
+    response = list_team_members(token, role)
 
     logging.info(response)
     return response
