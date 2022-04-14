@@ -365,7 +365,7 @@ def register_team(team_name: str, owner: dict) -> str:
 
     team["members"].append(owner)
     teams.insert_one(team)
-
+    _ = update_user_team(team_name, owner["email"])
     return f"{team_name} successfully created."
 
 
@@ -396,12 +396,14 @@ def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
         "hex_color": user["hex_color"],
     }
     teams.update_one(query, {"$push": {"members": member}})
+
+    _ = update_user_team(team_name, invitee_email)
     return f"{invitee_email} successfully added to {team_name} as a{' ' + role if role == 'Member' else 'n ' + role}"
 
 
-def is_member_of(team_name: str, token: str) -> bool:
+def is_member_of(token: str) -> bool:
     user = get_user_from_token(token)
-    _, members = get_members_of(team_name)
+    _, members = get_members_of(user["team"])
     if any(member["email"] == user["email"] for member in members):
         return True
     return False
@@ -426,6 +428,14 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
             members.append(member)
 
     return f"Successfully got list of members in {team_name} with role {role}", members
+
+
+def update_user_team(team_name: str, email: str) -> str:
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+    users.update_one(query, {"$set": {"team": team_name}})
+    logging.info(f"Updating {email}'s team to {team_name}")
 
 
 def db_cleanup() -> Tuple[int, int]:
