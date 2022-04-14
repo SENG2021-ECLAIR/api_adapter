@@ -26,6 +26,84 @@ def get_user(email: str) -> Optional[dict]:
     return users.find_one({"email": email})
 
 
+def get_user_from_token(token: str) -> dict:
+    """
+    Given a token return a user
+    """
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    query = {"token": token}
+    user = logged_in.find_one(query)
+    return user
+
+
+def check_registered(email):
+    """
+    Given an email, check if it belongs to a registered user
+    """
+    if email is None:
+        return False
+
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+    user = users.find_one(query)
+
+    return True if user is not None else False
+
+
+def get_list_users() -> dict:
+    """
+    List all registered users in the database
+    """
+    db = connect_to_db()
+    users = db["users"]
+    users_list = list(users.find({}))
+    response = {"users": []}
+    for user in users_list:
+        response["users"].append(
+            {
+                "email": user["email"],
+                "firstname": user["firstname"],
+                "lastname": user["lastname"],
+                "num_invoices": len(user["invoices"]),
+            }
+        )
+    return response
+
+
+def check_logged_in_email(email: str = None):
+    """
+    Given an email, check if it belongs to a logged in user
+    """
+    if email is None:
+        return False
+
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    query = {"email": email}
+    user = logged_in.find_one(query)
+
+    return True if user is not None else False
+
+
+def check_logged_in_token(
+    token: str = None,
+):
+    """
+    Given a token, check if it belongs to a logged in user
+    """
+    if token is None:
+        return False
+
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    query = {"token": token}
+    user = logged_in.find_one(query)
+
+    return True if user is not None else False
+
+
 def register_user(user_data: dict) -> str:
     """
     Creates document in db containing users information including hashed password, returning a generated token
@@ -38,6 +116,8 @@ def register_user(user_data: dict) -> str:
 
     users = db["users"]
     users.insert_one(user_data)
+
+    get_user_profile_color(email)
 
     return f"User {email} registered"
 
@@ -258,7 +338,99 @@ def update_user_password(email: str, password: str, new_password: str) -> str:
     return f"{email} is not a registered user"
 
 
-def db_cleanup() -> int:
+def register_team(team_name: str, owner: dict) -> str:
+    db = connect_to_db()
+    teams = db["teams"]
+    query = {"team_name": team_name}
+    team = teams.find_one(query)
+    if team is not None:
+        logging.error(f"{team_name} is already a registered team")
+        return f"{team_name} is already a registered team"
+
+    user = get_user(owner["email"])
+
+    owner = {
+        "firstname": user["firstname"],
+        "lastname": user["lastname"],
+        "email": user["email"],
+        "role": "Owner",
+        "time_joined": get_time(),
+        "hex_color": user["hex_color"],
+    }
+
+    team = {
+        "team_name": team_name,
+        "time_created": get_time(),
+        "team_owner": owner,
+        "members": [],
+    }
+
+    team["members"].append(owner)
+    teams.insert_one(team)
+
+    return f"{team_name} successfully created."
+
+
+def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
+    db = connect_to_db()
+    teams = db["teams"]
+    query = {"team_name": team_name}
+    team = teams.find_one(query)
+    if team is None:
+        logging.error(f"{team_name} does not exist")
+        return f"{team_name} does not exist"
+
+    user = get_user(invitee_email)
+    if user is None:
+        logging.error(f"{invitee_email} does not exist")
+        return f"{invitee_email} does not exist"
+
+    if any(member["email"] == invitee_email for member in team["members"]):
+        logging.error(f"{invitee_email} is already in this team")
+        return f"{invitee_email} is already in this team"
+
+    member = {
+        "firstname": user["firstname"],
+        "lastname": user["lastname"],
+        "email": user["email"],
+        "role": role,
+        "time_joined": get_time(),
+        "hex_color": user["hex_color"],
+    }
+    teams.update_one(query, {"$push": {"members": member}})
+    return f"{invitee_email} successfully added to {team_name} as a{' ' + role if role == 'Member' else 'n ' + role}"
+
+
+def is_member_of(team_name: str, token: str) -> bool:
+    user = get_user_from_token(token)
+    _, members = get_members_of(team_name)
+    if any(member["email"] == user["email"] for member in members):
+        return True
+    return False
+
+
+def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
+    db = connect_to_db()
+    teams = db["teams"]
+    query = {"team_name": team_name}
+    team = teams.find_one(query)
+    if team is None:
+        logging.error(f"{team_name} does not exist")
+        return f"{team_name} does not exist", []
+
+    if role is None:
+        return f"Successfully got list of members in {team_name}", team["members"]
+
+    members = []
+
+    for member in team["members"]:
+        if member["role"] == role:
+            members.append(member)
+
+    return f"Successfully got list of members in {team_name} with role {role}", members
+
+
+def db_cleanup() -> Tuple[int, int]:
     db = connect_to_db()
     users = db["users"]
     logged_in = db["logged_in"]
