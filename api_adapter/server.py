@@ -198,7 +198,7 @@ def team_invite_route():
     return response
 
 
-@APP.route("/team/members", methods=["GET"])
+@APP.route("/team/members", methods=["POST"])
 def team_members_route():
     token = request.headers.get("token")
     if not check_logged_in_token(token):
