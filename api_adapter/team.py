@@ -6,7 +6,6 @@ from api_adapter.database import (
     add_user_to_team,
     get_members_of,
     get_user_from_token,
-    is_member_of,
     register_team,
 )
 
@@ -33,13 +32,15 @@ def list_team_invoices(team_name: str) -> dict:
     pass
 
 
-def list_team_members(token: str, team_name: str, role: str) -> dict:
-    if not is_member_of(team_name, token):
-        return {"msg": f"User is not a member of team {team_name}"}
-
+def list_team_members(token: str, role: str) -> dict:
+    """
+    Given a token and a role, list the members of the
+    logged_in users team with that role.
+    """
+    user = get_user_from_token(token)
     if not check_role(role):
         role = None
-    msg, members = get_members_of(team_name, role)
+    msg, members = get_members_of(user["team"], role)
     return {"msg": msg, "members": members}
 
 

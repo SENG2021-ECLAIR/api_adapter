@@ -198,19 +198,13 @@ def team_invite_route():
     return response
 
 
-@APP.route("/team/members", methods=["GET"])
+@APP.route("/team/members", methods=["POST"])
 def team_members_route():
     token = request.headers.get("token")
     if not check_logged_in_token(token):
         return {"msg": "Invalid token"}
-    body = request.get_json()
-    role = None
-    if "team_name" not in body:
-        return {"msg": "Needs team_name in the body."}
-    elif "role" in body:
-        role = body["role"]
-
-    response = list_team_members(token, body["team_name"], role)
+    role = request.args.get("role")
+    response = list_team_members(token, role)
 
     logging.info(response)
     return response
