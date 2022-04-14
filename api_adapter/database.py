@@ -120,9 +120,9 @@ def register_user(user_data: dict) -> str:
     users = db["users"]
     users.insert_one(user_data)
 
-    get_user_profile_color(email)
+    hex_color = get_user_profile_color(email)
 
-    return f"User {email} registered"
+    return (f"User {email} registered", hex_color)
 
 
 def login_user(email: str, password: str) -> str:

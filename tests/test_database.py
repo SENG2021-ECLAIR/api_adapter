@@ -44,7 +44,7 @@ def test_register_user(db):
     response = register_user(test_user_data)
 
     assert users.find_one(query) is not None
-    assert response == f"User {test_user_data['email']} registered"
+    assert response[0] == f"User {test_user_data['email']} registered"
 
     cleanup(db, test_user_data["email"])
 
