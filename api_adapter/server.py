@@ -216,6 +216,14 @@ def test_route():
     return body
 
 
+@APP.route("/stats/daily", methods=["GET"])
+def daily_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return 
+
+
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():
     # DEV ONLY ROUTE SHOULD
