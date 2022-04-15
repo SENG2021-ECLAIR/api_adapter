@@ -18,20 +18,23 @@ def test_list_invoice(db):
 
     data = list_invoices(token)
 
-    assert len(data["invoices"]) == 0
+    assert len(data["created_invoices"]) == 0
+    assert len(data["received_invoices"]) == 0
     assert data["msg"] == "Successfully retreived invoices for test@email.com"
 
     users = db["users"]
     users_query = {"email": test_user_data["email"]}
 
-    test_data = {"test": "data"}
+    test_data = {"test": "data", "method": "created"}
 
     users.update_one(users_query, {"$push": {"invoices": test_data}})
 
     data = list_invoices(token)
 
-    assert len(data["invoices"]) == 1
-    assert data["invoices"][0] == test_data
+    assert len(data["created_invoices"]) == 1
+    assert len(data["received_invoices"]) == 0
+
+    assert data["created_invoices"][0] == test_data
     assert data["msg"] == "Successfully retreived invoices for test@email.com"
 
     cleanup(db, test_user_data["email"])
