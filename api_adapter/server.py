@@ -120,7 +120,7 @@ def update_password_route():
     return response
 
 
-@APP.route("/send", methods=["POST"])
+@APP.route("/invoice/send", methods=["POST"])
 def send_route():
     body = request.get_json()
     response = send_invoice(body)
