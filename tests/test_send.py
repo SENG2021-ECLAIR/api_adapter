@@ -1,9 +1,3 @@
-from inspect import _void
-import json
-import xml.etree.ElementTree as ET
-
-import pytest
-
 from api_adapter.send import send_invoice
 
 VALID = 200
@@ -19,11 +13,12 @@ def test_successful_ubl():
         "invoiceTitle": "UBL Invoice",
         "mailContent": "Attached below is your UBL Invoice",
         "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": input_file
+        "file": input_file,
     }
     result = send_invoice(input)
     input_file.close()
     assert result.status_code == VALID
+
 
 def test_access_error():
     input_file = open("tests/test_data/test_valid_response.xml")
@@ -32,11 +27,12 @@ def test_access_error():
         "invoiceTitle": "UBL Invoice",
         "mailContent": "Attached below is your UBL Invoice",
         "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": input_file
+        "file": input_file,
     }
     result = send_invoice(input)
     input_file.close()
     assert result.status_code == ACCESS_ERROR
+
 
 def test_empty_token():
     input_file = open("tests/test_data/test_valid_response.xml")
@@ -45,11 +41,12 @@ def test_empty_token():
         "invoiceTitle": "UBL Invoice",
         "mailContent": "Attached below is your UBL Invoice",
         "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": input_file
+        "file": input_file,
     }
     result = send_invoice(input)
     input_file.close()
     assert result.status_code == ACCESS_ERROR
+
 
 def test_empty_title():
     input_file = open("tests/test_data/test_valid_response.xml")
@@ -58,11 +55,12 @@ def test_empty_title():
         "invoiceTitle": "",
         "mailContent": "Attached below is your UBL Invoice",
         "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": input_file
+        "file": input_file,
     }
     result = send_invoice(input)
     input_file.close()
     assert result.status_code == VALID
+
 
 def test_empty_content():
     input_file = open("tests/test_data/test_valid_response.xml")
@@ -71,11 +69,12 @@ def test_empty_content():
         "invoiceTitle": "UBL Invoice",
         "mailContent": "",
         "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": input_file
+        "file": input_file,
     }
     result = send_invoice(input)
     input_file.close()
     assert result.status_code == VALID
+
 
 def test_empty_email():
     input_file = open("tests/test_data/test_valid_response.xml")
@@ -84,11 +83,12 @@ def test_empty_email():
         "invoiceTitle": "UBL Invoice",
         "mailContent": "Attached below is your UBL Invoice",
         "recipientEmail": "",
-        "file": input_file
+        "file": input_file,
     }
     result = send_invoice(input)
     input_file.close()
     assert result.status_code == ACCESS_ERROR
+
 
 def test_empty_file():
     input = {
@@ -96,7 +96,7 @@ def test_empty_file():
         "invoiceTitle": "UBL Invoice",
         "mailContent": "Attached below is your UBL Invoice",
         "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": ""
+        "file": "",
     }
     result = send_invoice(input)
     assert result.status_code == ACCESS_ERROR

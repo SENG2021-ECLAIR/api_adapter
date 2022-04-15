@@ -46,7 +46,7 @@ def test_register_user(db):
     response = register_user(test_user_data)
 
     assert users.find_one(query) is not None
-    assert response == f"User {test_user_data['email']} registered"
+    assert response[0] == f"User {test_user_data['email']} registered"
 
     cleanup(db, test_user_data["email"])
 
@@ -199,7 +199,7 @@ def test_store_invoice(db):
 
     assert user["invoices"] == []
 
-    msg = store_invoice(token, "somestring")
+    msg = store_invoice(token, "somestring", "created")
     user = users.find_one(query)
 
     assert (
@@ -207,8 +207,9 @@ def test_store_invoice(db):
     )
     assert len(user["invoices"]) == 1
     assert user["invoices"][0]["content"] == "somestring"
+    assert user["invoices"][0]["method"] == "created"
 
-    msg = store_invoice(token, "some other string")
+    msg = store_invoice(token, "some other string", "received")
     user = users.find_one(query)
 
     assert (
@@ -216,6 +217,7 @@ def test_store_invoice(db):
     )
     assert len(user["invoices"]) == 2
     assert user["invoices"][1]["content"] == "some other string"
+    assert user["invoices"][1]["method"] == "received"
 
 
 def test_delete_invoice(db):
@@ -231,12 +233,12 @@ def test_delete_invoice(db):
     assert user["invoices"] == []
     invoice_id = db["invoice_id"].find_one()["invoice_id"]
 
-    store_invoice(token, "somestring")
+    store_invoice(token, "somestring", "created")
     user = users.find_one(query)
     assert len(user["invoices"]) == 1
     assert user["invoices"][0]["invoice_id"] == invoice_id
 
-    store_invoice(token, "somestring2")
+    store_invoice(token, "somestring2", "created")
     user = users.find_one(query)
     invoice_id_two = user["invoices"][1]["invoice_id"]
 
