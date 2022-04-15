@@ -4,7 +4,7 @@ Functionality for the send endpoint
 - Generates a status report
 """
 
-import requests
+import requests, os
 
 
 def send_invoice(input):
@@ -14,7 +14,13 @@ def send_invoice(input):
         "mailContent": input["mailContent"],
         "recipientEmail": input["recipientEmail"],
     }
-    data2 = {"file": input["file"]}
+    f = open("xml_file.xml", "w")
+    f.write(input["file"])
+    f.close()
+
+    file = open("xml_file.xml")
+    data2 = {"file": file}
     url = "https://honeycomb-prod.herokuapp.com/send"
     post_val = requests.post(url, data=data1, files=data2)
+    file.close()
     return post_val
