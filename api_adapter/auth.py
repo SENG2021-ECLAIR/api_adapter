@@ -28,6 +28,7 @@ def signup(user_data: dict) -> dict:
             data: dict = {
                 message: string
                 token: string
+                hex_color: string
             }
 
     """
@@ -51,7 +52,7 @@ def signup(user_data: dict) -> dict:
         return {"msg": "First and Last names must not be empty"}
 
     user_data["password"] = encrypt_password(user_data["password"])
-    msg = register_user(user_data)
+    msg, hex_color = register_user(user_data)
     if msg != f"User {user_data['email']} registered":
         return {"msg": msg, "token": None}
 
@@ -59,7 +60,7 @@ def signup(user_data: dict) -> dict:
 
     if token is not None:
         msg += " and logged in"
-    return {"msg": msg, "token": token}
+    return {"msg": msg, "token": token, "hex_color": hex_color}
 
 
 def login(credentials: dict) -> dict:

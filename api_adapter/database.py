@@ -34,6 +34,9 @@ def get_user_from_token(token: str) -> dict:
     logged_in = db["logged_in"]
     query = {"token": token}
     user = logged_in.find_one(query)
+    users_collection = db["users"]
+    query = {"email": user["email"]}
+    user = users_collection.find_one(query)
     return user
 
 
@@ -117,9 +120,9 @@ def register_user(user_data: dict) -> str:
     users = db["users"]
     users.insert_one(user_data)
 
-    get_user_profile_color(email)
+    hex_color = get_user_profile_color(email)
 
-    return f"User {email} registered"
+    return (f"User {email} registered", hex_color)
 
 
 def login_user(email: str, password: str) -> str:
@@ -236,7 +239,6 @@ hex_colors = [
     "#645DD7",
     "#054A91",
     "#447604",
-    "#9A275A",
     "#0CA4A5",
     "#EDB230",
     "#EE2E31",
@@ -367,7 +369,7 @@ def register_team(team_name: str, owner: dict) -> str:
 
     team["members"].append(owner)
     teams.insert_one(team)
-
+    _ = update_user_team(team_name, owner["email"])
     return f"{team_name} successfully created."
 
 
@@ -398,12 +400,14 @@ def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
         "hex_color": user["hex_color"],
     }
     teams.update_one(query, {"$push": {"members": member}})
+
+    _ = update_user_team(team_name, invitee_email)
     return f"{invitee_email} successfully added to {team_name} as a{' ' + role if role == 'Member' else 'n ' + role}"
 
 
-def is_member_of(team_name: str, token: str) -> bool:
+def is_member_of(token: str) -> bool:
     user = get_user_from_token(token)
-    _, members = get_members_of(team_name)
+    _, members = get_members_of(user["team"])
     if any(member["email"] == user["email"] for member in members):
         return True
     return False
@@ -428,6 +432,14 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
             members.append(member)
 
     return f"Successfully got list of members in {team_name} with role {role}", members
+
+
+def update_user_team(team_name: str, email: str) -> str:
+    db = connect_to_db()
+    users = db["users"]
+    query = {"email": email}
+    users.update_one(query, {"$set": {"team": team_name}})
+    logging.info(f"Updating {email}'s team to {team_name}")
 
 
 def db_cleanup() -> Tuple[int, int]:
