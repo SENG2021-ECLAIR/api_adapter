@@ -16,5 +16,5 @@ def num_created_stats(token):
 
     return {
         "msg": msg,
-        "num_created_inv": len(invoices["created"])
+        "num_created_inv": len(created_invoices)
     }
