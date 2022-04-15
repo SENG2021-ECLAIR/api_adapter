@@ -12,8 +12,10 @@ def connect_to_db():
     """
     Connect to db
     """
-    # client = MongoClient(f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true")
-    client = MongoClient(f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority")
+    # client = MongoClient(f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority")
+    client = MongoClient(
+        f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true"
+    )
     return client[ENVOY]
 
 
@@ -24,8 +26,6 @@ def create_invoice_count():
         db["invoice_id"].insert_one(invoice_id)
         return "Invoice Id counter added"
     else:
-        # Reset for testing purposes
-        # db["invoice_id"].update_one({}, {"$set": {"invoice_id": 0}})
         return "Counter exists"
 
 
@@ -173,6 +173,9 @@ def db_cleanup() -> int:
 
 
 def delete_invoice(token: str, invoice_id: int):
+    """
+    Delete invoice instance by invoice_id
+    """
     db = connect_to_db()
     logged_in = db["logged_in"]
     logged_in_query = {"token": token}
@@ -181,21 +184,18 @@ def delete_invoice(token: str, invoice_id: int):
     if logged_in_user is None:
         logging.error("Need to login to delete invoice")
         return ([], "Need to login to delete invoice")
-    # users = db["users"]
-    # users_query = {"email": logged_in_user["email"]}
-    # user = users.find_one(users_query)
-    # index = None
 
-    # for i in range(0, len(user["invoices"])):
-    # if user["invoices"][i]["invoice_id"] == invoice_id:
-    # email = user["email"]
-    # index = i
-    # db["users"].delete_one({"invoices": {"invoice_id": invoice_id}})
-    db["users"].update_one(
-        {"email": logged_in_user["email"]}, {"$pull": {"invoices": {"invoice_id": 0}}}
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+    user = users.find_one(users_query)
+    _id = user["_id"]
+
+    db.users.update_many(
+        {"_id": _id}, {"$pull": {"invoices": {"invoice_id": invoice_id}}}
     )
-    # "email": logged_in_user["email"]
-    # print(invoices_query)
-    # users.delete_one({"invoices": {"invoice_id": invoice_id}})
 
-    return "hello"
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+    user = users.find_one(users_query)
+
+    return f"Successfully deleted invoice {invoice_id}"

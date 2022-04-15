@@ -3,6 +3,7 @@ Endpoints that allows for the user to use the buttons:
     - create
     - render
     - send
+    - delete
     - login
     - log out
     - send
@@ -11,14 +12,16 @@ Endpoints that allows for the user to use the buttons:
 
 import json
 import logging
+
 from flask import Flask, request
-from api_adapter.send import send_invoice
 from flask_cors import CORS
+
 from api_adapter.auth import login, logout, signup
 from api_adapter.create import persist_invoice
-from api_adapter.database import db_cleanup
+from api_adapter.database import db_cleanup, delete_invoice
 from api_adapter.listing import list_invoices
 from api_adapter.render import get_render
+from api_adapter.send import send_invoice
 
 APP = Flask(__name__)
 CORS(APP)
@@ -97,6 +100,16 @@ def render_invoice_route():
     if token is None or invoice_id is None:
         return {"msg": "Needs token and invoice_id in headers"}
     response = get_render(token, int(invoice_id))
+    return json.dumps(response)
+
+
+@APP.route("/invoice/delete", methods=["DELETE"])
+def delete_invoice_route():
+    token = request.headers.get("token")
+    invoice_id = request.headers.get("invoice_id")
+    if token is None or invoice_id is None:
+        return {"msg": "Needs token and invoice_id in headers"}
+    response = delete_invoice(token, int(invoice_id))
     return json.dumps(response)
 
 
