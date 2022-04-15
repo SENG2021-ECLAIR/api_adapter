@@ -1,4 +1,4 @@
-from api_adapter.database import (
+from api_adapter.database import (  # create_invoice_count,; delete_invoice,
     get_user,
     login_user,
     logout_user,
@@ -214,3 +214,38 @@ def test_store_invoice(db):
     )
     assert len(user["invoices"]) == 2
     assert user["invoices"][1]["content"] == "some other string"
+
+
+"""def test_delete_invoice(db):
+    users = db["users"]
+    cleanup(db, test_user_data["email"])
+    query = {"email": test_user_data["email"]}
+
+    # Register and login test user
+    _ = register_user(test_user_data)
+    token, _ = login_user(test_user_data["email"], test_user_data["password"])
+
+    user = users.find_one(query)
+    assert user["invoices"] == []
+    invoice_id = db["invoice_id"].find_one()["invoice_id"]
+    print(invoice_id)
+    msg = store_invoice(token, "somestring")
+    user = users.find_one(query)
+    print(user)
+    #print(user["invoices"])
+    assert len(user["invoices"]) == 1
+    assert user["invoices"][0]["invoice_id"] == invoice_id
+
+    my = delete_invoice(token, invoice_id)
+    user = users.find_one(query)
+    print(user["invoices"])
+    assert my == "hello"
+    assert len(user["invoices"]) == 0
+
+def test_invoice_count(db):
+    users = db["users"]
+    cleanup(db, test_user_data["email"])
+    assert create_invoice_count() == "Counter exists"
+    #invoice_ids = db["invoice_id"]
+    #count = invoice_ids.find_one({"invoice_id": 0})
+    #assert count["invoice_id"] == 0"""
