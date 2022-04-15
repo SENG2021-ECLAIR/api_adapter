@@ -3,7 +3,7 @@ Calculate and create the stats of the users.
 """
 
 from api_adapter.database import get_invoices
-import datetime
+import datetime, xmltodict
 
 def last_thirty_days_stats(token):
     """
@@ -38,7 +38,9 @@ def last_thirty_days_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
             if invoice_datetime == curr_date:
-                list_stats[i] += 1
+                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+                monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
+                list_stats[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
         # loop back each date
         curr_date -= datetime.timedelta(1)
