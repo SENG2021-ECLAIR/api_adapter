@@ -23,4 +23,5 @@ def send_invoice(input):
     url = "https://honeycomb-prod.herokuapp.com/send"
     post_val = requests.post(url, data=data1, files=data2)
     file.close()
+    os.remove("xml_file.xml")
     return post_val
