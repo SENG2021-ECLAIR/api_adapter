@@ -31,7 +31,11 @@ from api_adapter.render import get_render
 from api_adapter.send import send_invoice
 from api_adapter.team import create_team, invite_member, list_team_members
 from api_adapter.users import list_users
-from api_adapter.stats import curr_month_stats, last_thirty_days_stats
+from api_adapter.stats import (
+    curr_month_stats, 
+    last_thirty_days_stats,
+    curr_year_stats
+)
 
 APP = Flask(__name__)
 CORS(APP)
@@ -227,6 +231,13 @@ def month_stats():
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(curr_month_stats(token))
+
+@APP.route("/stats/year", methods=["GET"])
+def month_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return json.dumps(curr_year_stats(token))
 
 @APP.route("/stats/thirtydays", methods=["GET"])
 def daily_stats():
