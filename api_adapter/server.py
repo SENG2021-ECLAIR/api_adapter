@@ -3,6 +3,7 @@ Endpoints that allows for the user to use the buttons:
     - create
     - render
     - send
+    - delete
     - login
     - log out
     - send
@@ -17,7 +18,7 @@ from flask_cors import CORS
 
 from api_adapter.auth import login, logout, signup
 from api_adapter.create import persist_invoice
-from api_adapter.database import check_logged_in_token, db_cleanup
+from api_adapter.database import check_logged_in_token, db_cleanup, delete_invoice
 from api_adapter.listing import list_invoices
 from api_adapter.profile import (
     profile_details,
@@ -30,6 +31,11 @@ from api_adapter.render import get_render
 from api_adapter.send import send_invoice
 from api_adapter.team import create_team, invite_member, list_team_members
 from api_adapter.users import list_users
+from api_adapter.stats import (
+    curr_month_stats,
+    last_thirty_days_stats,
+    num_created_stats
+)
 
 APP = Flask(__name__)
 CORS(APP)
@@ -156,6 +162,16 @@ def render_invoice_route():
     return json.dumps(response)
 
 
+@APP.route("/invoice/delete", methods=["DELETE"])
+def delete_invoice_route():
+    token = request.headers.get("token")
+    invoice_id = request.headers.get("invoice_id")
+    if token is None or invoice_id is None:
+        return {"msg": "Needs token and invoice_id in headers"}
+    response = delete_invoice(token, int(invoice_id))
+    return json.dumps(response)
+
+
 @APP.route("/users/list", methods=["GET"])
 def list_users_route():
     token = request.headers.get("token")
@@ -209,12 +225,31 @@ def team_members_route():
     logging.info(response)
     return response
 
+@APP.route("/stats/created", methods=["GET"])
+def create_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return json.dumps(num_created_stats(token))
+
+@APP.route("/stats/month", methods=["GET"])
+def month_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return json.dumps(curr_month_stats(token))
+
+@APP.route("/stats/thirtydays", methods=["GET"])
+def daily_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return json.dumps(last_thirty_days_stats(token))
 
 @APP.route("/test", methods=["POST"])
 def test_route():
     body = request.get_json()
     return body
-
 
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():
