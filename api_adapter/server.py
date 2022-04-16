@@ -233,7 +233,7 @@ def month_stats():
     return json.dumps(curr_month_stats(token))
 
 @APP.route("/stats/year", methods=["GET"])
-def month_stats():
+def year_stats():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
