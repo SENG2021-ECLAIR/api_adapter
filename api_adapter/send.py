@@ -4,7 +4,9 @@ Functionality for the send endpoint
 - Generates a status report
 """
 
-import requests, os
+import os
+
+import requests
 
 
 def send_invoice(input):
@@ -24,4 +26,4 @@ def send_invoice(input):
     post_val = requests.post(url, data=data1, files=data2)
     file.close()
     os.remove("xml_file.xml")
-    return post_val
+    return {"response": post_val.text, "response_code": post_val.status_code}
