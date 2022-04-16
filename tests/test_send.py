@@ -17,7 +17,7 @@ def test_successful_ubl():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == VALID
+    assert result["response"].status_code == VALID
 
 
 def test_access_error():
@@ -31,7 +31,7 @@ def test_access_error():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == ACCESS_ERROR
+    assert result["response"].status_code == ACCESS_ERROR
 
 
 def test_empty_token():
@@ -45,7 +45,7 @@ def test_empty_token():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == ACCESS_ERROR
+    assert result["response"].status_code == ACCESS_ERROR
 
 
 def test_empty_title():
@@ -59,7 +59,7 @@ def test_empty_title():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == VALID
+    assert result["response"].status_code == VALID
 
 
 def test_empty_content():
@@ -73,7 +73,7 @@ def test_empty_content():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == VALID
+    assert result["response"].status_code == VALID
 
 
 def test_empty_email():
@@ -87,4 +87,4 @@ def test_empty_email():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == ACCESS_ERROR
+    assert result["response"].status_code == ACCESS_ERROR
