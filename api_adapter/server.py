@@ -226,7 +226,7 @@ def team_members_route():
     return response
 
 @APP.route("/stats/day", methods=["GET"])
-def month_stats():
+def daily_stats():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
