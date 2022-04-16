@@ -23,7 +23,7 @@ def last_thirty_days_stats(token):
     today_date = datetime.datetime.now()
 
     # find the date 30 days ago
-    start_date = today_date - datetime.timedelta(31)
+    start_date = today_date - datetime.timedelta(30)
 
     curr_date = today_date
 
@@ -38,9 +38,10 @@ def last_thirty_days_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
             if invoice_datetime == curr_date:
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
-                monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
-                list_stats[i] += float(monetary["cbc:PayableAmount"]["#text"])
+                # inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+                # monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
+                # list_stats[i] += float(monetary["cbc:PayableAmount"]["#text"])
+                list_stats[i] += 1
 
         # loop back each date
         curr_date -= datetime.timedelta(1)

@@ -210,7 +210,7 @@ def team_members_route():
     logging.info(response)
     return response
 
-@APP.route("/stats/daily", methods=["GET"])
+@APP.route("/stats/thirtydays", methods=["GET"])
 def daily_stats():
     token = request.headers.get("token")
     if token is None:
