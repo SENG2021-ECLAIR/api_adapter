@@ -12,8 +12,6 @@ def last_thirty_days_stats(token):
 
     invoices, msg = get_invoices(token)
 
-    created_invoices = invoices["created"]
-
     list_stats = []
 
     for _ in range(0,30):
@@ -30,14 +28,17 @@ def last_thirty_days_stats(token):
     i = 0
 
     while curr_date != start_date:
-        for invoice in created_invoices:
-            time_of_invoice = invoice["invoices"]["timestamp"]
+        for invoice in invoices["created"]:
+            time_of_invoice = invoice["timestamp"]
 
             # parse datetime
             invoice_datetime = datetime.datetime.strptime(
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
-            if invoice_datetime == curr_date:
+
+            if (invoice_datetime.month == curr_date.month
+               and invoice_datetime.year == curr_date.year
+               and invoice_datetime.day == curr_date.day):
                 # inv_dict = xmltodict.parse(invoice["invoices"]["content"])
                 # monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 # list_stats[i] += float(monetary["cbc:PayableAmount"]["#text"])
