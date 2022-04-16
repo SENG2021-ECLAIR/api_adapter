@@ -26,4 +26,4 @@ def send_invoice(input):
     post_val = requests.post(url, data=data1, files=data2)
     file.close()
     os.remove("xml_file.xml")
-    return {"response": post_val, "response_code": post_val.status_code}
+    return {"response": post_val.text, "response_code": post_val.status_code}
