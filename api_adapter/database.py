@@ -439,7 +439,7 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
             query = {"email": member["email"]}
             members.append(users.find_one(query))
 
-        return f"Successfully got list of members in {team_name}", team["members"]
+        return f"Successfully got list of members in {team_name}", members
 
     for member in team["members"]:
         query = {"email": member["email"]}
