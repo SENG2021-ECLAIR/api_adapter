@@ -247,7 +247,7 @@ def team_members_route():
 @APP.route("/team/stats", methods=["GET"])
 def team_stats_route():
     token = request.headers.get("token")
-    chart = request.args.get("chart")
+    chart = request.args.get("chart_type")
     if not check_logged_in_token(token):
         return {"msg": "Invalid token"}
 
