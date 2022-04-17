@@ -34,7 +34,8 @@ from api_adapter.users import list_users
 from api_adapter.stats import (
     curr_month_stats, 
     last_thirty_days_stats,
-    curr_year_stats
+    curr_year_stats,
+    num_created_stats,
 )
 
 APP = Flask(__name__)
@@ -224,6 +225,13 @@ def team_members_route():
 
     logging.info(response)
     return response
+
+@APP.route("/stats/created", methods=["GET"])
+def create_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return json.dumps(num_created_stats(token))
 
 @APP.route("/stats/month", methods=["GET"])
 def month_stats():
