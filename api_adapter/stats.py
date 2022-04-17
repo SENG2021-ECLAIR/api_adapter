@@ -378,3 +378,4 @@ def num_created_stats(token):
         "msg": msg,
         "num_created_inv": len(created_invoices)
     }
+
