@@ -27,20 +27,19 @@ from api_adapter.profile import (
     update_profile_firstname,
     update_profile_lastname,
 )
-from api_adapter.render import get_render
-from api_adapter.send import send_invoice
 from api_adapter.render_json import form_json
+from api_adapter.send import send_invoice
+from api_adapter.stats import (
+    curr_daily_stats,
+    curr_month_stats,
+    curr_year_stats,
+    last_thirty_days_stats,
+    num_created_stats,
+    num_received_stats,
+    num_sent_stats,
+)
 from api_adapter.team import create_team, invite_member, list_team_members
 from api_adapter.users import list_users
-from api_adapter.stats import (
-    curr_month_stats,
-    last_thirty_days_stats,
-    num_sent_stats
-    num_received_stats
-    curr_daily_stats
-    curr_year_stats,
-    num_created_stats,
-)
 
 APP = Flask(__name__)
 CORS(APP)
@@ -230,59 +229,68 @@ def team_members_route():
     logging.info(response)
     return response
 
+
 @APP.route("/stats/sent", methods=["GET"])
-def sent_stats():
+def sent_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(num_sent_stats(token))
 
+
 @APP.route("/stats/received", methods=["GET"])
-def received_stats():
+def received_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(num_received_stats(token))
 
+
 @APP.route("/stats/day", methods=["GET"])
-def daily_stats():
+def daily_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(curr_daily_stats(token))
 
+
 @APP.route("/stats/created", methods=["GET"])
-def create_stats():
+def create_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(num_created_stats(token))
 
+
 @APP.route("/stats/month", methods=["GET"])
-def month_stats():
+def month_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(curr_month_stats(token))
 
+
 @APP.route("/stats/year", methods=["GET"])
-def year_stats():
+def year_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(curr_year_stats(token))
 
+
 @APP.route("/stats/thirtydays", methods=["GET"])
-def daily_stats():
+def thirty_daily_stats_route():
     token = request.headers.get("token")
     if token is None:
         return {"msg": "Needs token in headers"}
     return json.dumps(last_thirty_days_stats(token))
 
+
 @APP.route("/test", methods=["POST"])
 def test_route():
     body = request.get_json()
     return body
+
 
 @APP.route("/cleanup", methods=["POST"])
 def cleanup_route():
