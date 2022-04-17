@@ -11,7 +11,7 @@
                 </cac:Country>
                 <cbc:AdditionalStreetName>123 Rainbow St</cbc:AdditionalStreetName>
                 <cbc:CityName>Kensington</cbc:CityName>
-                <cbc:PostalZone>2000</cbc:PostalZone>
+                <cbc:PostalZone>2019</cbc:PostalZone>
                 <cbc:StreetName>Side A</cbc:StreetName>
             </cac:PostalAddress>
         </cac:Party>

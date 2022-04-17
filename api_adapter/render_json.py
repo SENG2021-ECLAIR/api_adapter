@@ -19,6 +19,7 @@ def conv_xml_format(ubl_string):
     try:
         xml_string = open("tests/test_data/example1.xml").read()
         xml_dict = conv_xml_to_dict(ubl_string)
+        xml_string = xml_string.replace("AUD", get_CurrencyType(xml_dict))
         xml_string = xml_string.replace("EBWASP1002", get_ID(xml_dict))
         xml_string = xml_string.replace("GST", get_InvoiceTaxSchemeID(xml_dict))
         xml_string = xml_string.replace("pencils", get_InvoiceName(xml_dict))
@@ -31,7 +32,11 @@ def conv_xml_format(ubl_string):
             "500.0</cbc:InvoicedQuantity>",
             f"{get_InvoiceQuantity(xml_dict)}</cbc:InvoicedQuantity>",
         )
-        xml_string = xml_string.replace("AUD", get_Currency(xml_dict))
+        xml_string = xml_string.replace(
+            "100.00</cbc:LineExtensionAmount>",
+            f"{get_Currency(xml_dict)}</cbc:LineExtensionAmount>",
+        )
+        print(get_Currency(xml_dict))
         xml_string = xml_string.replace("As agreed", get_PaymentTerms(xml_dict))
         xml_string = xml_string.replace(
             "10.00</cbc:TaxAmount>", f"{get_TaxAmount(xml_dict)}</cbc:TaxAmount>"
@@ -132,6 +137,12 @@ def try_date(input_date):
 # Gets a string of ID
 def get_ID(ubl_dict):
     val = ubl_dict["Invoice"]["cbc:ID"]
+    return try_string(val)
+
+
+# Gets currency type of ID (e.g. AUD)
+def get_CurrencyType(ubl_dict):
+    val = ubl_dict["Invoice"]["cbc:DocumentCurrencyCode"]
     return try_string(val)
 
 

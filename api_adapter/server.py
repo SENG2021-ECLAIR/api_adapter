@@ -146,7 +146,7 @@ def list_invoices_route():
     return json.dumps(response)
 
 
-@APP.route("/invoice/render", methods=["GET"])
+@APP.route("/invoice/render", methods=["POST"])
 def render_invoice_route():
     token = request.headers.get("token")
     address = request.headers.get("invoice_id")
