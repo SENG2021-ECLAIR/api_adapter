@@ -3,6 +3,7 @@ Endpoints that allows for the user to use the buttons:
     - create
     - render
     - send
+    - delete
     - login
     - log out
     - send
@@ -17,7 +18,7 @@ from flask_cors import CORS
 
 from api_adapter.auth import login, logout, signup
 from api_adapter.create import persist_invoice
-from api_adapter.database import check_logged_in_token, db_cleanup
+from api_adapter.database import check_logged_in_token, db_cleanup, delete_invoice
 from api_adapter.listing import list_invoices
 from api_adapter.profile import (
     profile_details,
@@ -26,8 +27,21 @@ from api_adapter.profile import (
     update_profile_firstname,
     update_profile_lastname,
 )
+
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
+from api_adapter.render_json import form_json
+from api_adapter.send import send_invoice
+from api_adapter.stats import (
+    curr_daily_stats,
+    curr_month_stats,
+    curr_year_stats,
+    last_thirty_days_stats,
+    num_created_stats,
+    num_received_stats,
+    num_sent_stats,
+)
+
 from api_adapter.team import create_team, invite_member, list_team_members
 from api_adapter.users import list_users
 
@@ -54,6 +68,7 @@ def signup_route():
     ):
         return {"msg": "Needs email, password, firstname and lastname in body"}
     response = signup(body)
+    logging.info(response)
     return response
 
 
@@ -63,6 +78,7 @@ def login_route():
     if "email" not in body or "password" not in body:
         return {"msg": "Needs email and password in body"}
     response = login(body)
+    logging.info(response)
     return response
 
 
@@ -72,6 +88,7 @@ def logout_route():
     if "token" not in body or "email" not in body:
         return {"msg": "Needs email and token in body"}
     response = logout(body)
+    logging.info(response)
     return response
 
 
@@ -81,6 +98,7 @@ def user_details_route():
     if "email" not in body:
         return {"msg": "Needs email in body"}
     response = profile_details(body)
+    logging.info(response)
     return response
 
 
@@ -90,6 +108,7 @@ def update_color_route():
     if "email" not in body:
         return {"msg": "Needs email in body"}
     response = update_profile_colour(body)
+    logging.info(response)
     return response
 
 
@@ -99,6 +118,7 @@ def update_firstname_route():
     if "email" not in body:
         return {"msg": "Needs email in body"}
     response = update_profile_firstname(body)
+    logging.info(response)
     return response
 
 
@@ -108,6 +128,7 @@ def update_lastname_route():
     if "email" not in body:
         return {"msg": "Needs email in body"}
     response = update_profile_lastname(body)
+    logging.info(response)
     return response
 
 
@@ -117,13 +138,15 @@ def update_password_route():
     if "password" not in body or "new_password" not in body:
         return {"msg": "Needs password in body"}
     response = reset_password(body)
+    logging.info(response)
     return response
 
 
-@APP.route("/send", methods=["POST"])
+@APP.route("/invoice/send", methods=["POST"])
 def send_route():
     body = request.get_json()
     response = send_invoice(body)
+    logging.info(response)
     return response
 
 
@@ -134,6 +157,7 @@ def create_route():
     if "token" not in body or "invoice_data" not in body:
         return {"msg": "Needs token and invoice_data"}
     response = persist_invoice(body["token"], body["invoice_data"])
+    logging.info(response)
     return json.dumps(response)
 
 
@@ -143,6 +167,7 @@ def list_invoices_route():
     if token is None:
         return {"msg": "Needs token in headers"}
     response = list_invoices(token)
+    logging.info(response)
     return json.dumps(response)
 
 
@@ -153,6 +178,18 @@ def render_invoice_route():
     if token is None or address is None:
         return {"msg": "Needs token and invoice_id in headers"}
     response = get_render(token, address)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/invoice/delete", methods=["DELETE"])
+def delete_invoice_route():
+    token = request.headers.get("token")
+    invoice_id = request.headers.get("invoice_id")
+    if token is None or invoice_id is None:
+        return {"msg": "Needs token and invoice_id in headers"}
+    response = delete_invoice(token, int(invoice_id))
+    logging.info(response)
     return json.dumps(response)
 
 
@@ -162,7 +199,7 @@ def list_users_route():
     if not check_logged_in_token(token):
         return {"msg": "Invalid token"}
     response = list_users()
-    print(response)
+    logging.info(response)
     return json.dumps(response)
 
 
@@ -175,6 +212,7 @@ def team_create_route():
     if "team_name" not in body:
         return {"msg": "Needs team_name in the body."}
     response = create_team(token, body["team_name"])
+    logging.info(response)
     return response
 
 
@@ -203,17 +241,81 @@ def team_members_route():
     token = request.headers.get("token")
     if not check_logged_in_token(token):
         return {"msg": "Invalid token"}
-    body = request.get_json()
-    role = None
-    if "team_name" not in body:
-        return {"msg": "Needs team_name in the body."}
-    elif "role" in body:
-        role = body["role"]
-
-    response = list_team_members(token, body["team_name"], role)
+    role = request.args.get("role")
+    response = list_team_members(token, role)
 
     logging.info(response)
-    return response
+    return json.dumps(response)
+
+
+@APP.route("/stats/sent", methods=["GET"])
+def sent_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = num_sent_stats(token)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/stats/received", methods=["GET"])
+def received_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = num_received_stats(token)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/stats/day", methods=["GET"])
+def daily_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = curr_daily_stats(token)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/stats/created", methods=["GET"])
+def create_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = num_created_stats(token)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/stats/month", methods=["GET"])
+def month_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = curr_month_stats(token)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/stats/year", methods=["GET"])
+def year_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = curr_year_stats(token)
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/stats/thirtydays", methods=["GET"])
+def thirty_daily_stats_route():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    response = last_thirty_days_stats(token)
+    logging.info(response)
+    return json.dumps(response)
 
 
 @APP.route("/test", methods=["POST"])
