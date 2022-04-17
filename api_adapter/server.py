@@ -34,6 +34,7 @@ from api_adapter.users import list_users
 from api_adapter.stats import (
     curr_month_stats,
     last_thirty_days_stats,
+    num_sent_stats
     num_received_stats
     curr_daily_stats
     curr_year_stats,
@@ -227,6 +228,13 @@ def team_members_route():
 
     logging.info(response)
     return response
+
+@APP.route("/stats/sent", methods=["GET"])
+def sent_stats():
+    token = request.headers.get("token")
+    if token is None:
+        return {"msg": "Needs token in headers"}
+    return json.dumps(num_sent_stats(token))
 
 @APP.route("/stats/received", methods=["GET"])
 def received_stats():

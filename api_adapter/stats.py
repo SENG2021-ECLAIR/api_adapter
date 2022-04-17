@@ -381,7 +381,8 @@ def num_created_stats(token):
 
 def num_received_stats(token):
     """
-    How many invoices created is returned.
+
+    How many invoices received is returned.
     """
 
     invoices, msg = get_invoices(token)
@@ -391,4 +392,25 @@ def num_received_stats(token):
     return {
         "msg": msg,
         "num_received_inv": len(received_invoices)
+    }
+
+
+def num_sent_stats(token):
+    """
+    How many invoices sent is returned.
+    """
+
+    invoices, msg = get_invoices(token)
+
+    created_invoices = invoices["created"]
+
+    num_sent = 0
+
+    for invoice in created_invoices:
+        if invoice["sent"]:
+            num_sent += 1
+
+    return {
+        "msg": msg,
+        "num_sent_inv": num_sent
     }
