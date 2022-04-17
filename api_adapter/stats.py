@@ -381,6 +381,7 @@ def num_created_stats(token):
 
 def num_received_stats(token):
     """
+
     How many invoices received is returned.
     """
 
