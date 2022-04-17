@@ -364,3 +364,18 @@ def curr_year_stats(token):
         "year_earns": year_earns,
         "last_five_years": list_prev_years
     }
+
+def num_created_stats(token):
+    """
+    How many invoices created is returned.
+    """
+
+    invoices, msg = get_invoices(token)
+
+    created_invoices = invoices["created"]
+
+    return {
+        "msg": msg,
+        "num_created_inv": len(created_invoices)
+    }
+
