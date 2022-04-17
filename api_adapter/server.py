@@ -38,7 +38,7 @@ from api_adapter.stats import (
     num_received_stats,
     num_sent_stats,
 )
-from api_adapter.team import create_team, invite_member, list_team_members
+from api_adapter.team import create_team, invite_member, list_team_members, team_stats
 from api_adapter.users import list_users
 
 APP = Flask(__name__)
@@ -239,6 +239,22 @@ def team_members_route():
         return {"msg": "Invalid token"}
     role = request.args.get("role")
     response = list_team_members(token, role)
+
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("/team/stats", methods=["GET"])
+def team_stats_route():
+    token = request.headers.get("token")
+    chart = request.args.get("chart")
+    if not check_logged_in_token(token):
+        return {"msg": "Invalid token"}
+
+    if chart is None:
+        return {"msg": "Need chart in params"}
+
+    response = team_stats(token, chart)
 
     logging.info(response)
     return json.dumps(response)

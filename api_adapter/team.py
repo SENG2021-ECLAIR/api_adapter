@@ -44,8 +44,37 @@ def list_team_members(token: str, role: str) -> dict:
     return {"msg": msg, "members": members}
 
 
-def team_stats():
-    pass
+def team_stats(token: str, chart: str) -> dict:
+    user = get_user_from_token(token)
+    if chart == "pie":
+        stats = team_pie_chart(user["team"])
+        msg = f"Successfully got pie chart data from {user['team']}"
+    elif chart == "OTHER":
+        pass
+    return {"msg": msg, "stats": stats}
+
+
+def team_pie_chart(team_name: str) -> dict:
+    """
+    Given a team name, get pie chart stats
+    """
+    stats = {"users": []}
+    total = 0
+    _, members = get_members_of(team_name, None)
+    for member in members:
+        num_invoices = len(member["invoices"])
+        stats["users"].append(
+            {
+                "email": member["email"],
+                "firstname": member["firstname"],
+                "lastname": member["lastname"],
+                "num_invoices": num_invoices,
+            }
+        )
+        total += num_invoices
+
+    stats["total_invoices"] = total
+    return stats
 
 
 def leave_team():
