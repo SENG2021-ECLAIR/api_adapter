@@ -437,14 +437,34 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
 
         for member in team["members"]:
             query = {"email": member["email"]}
-            members.append(users.find_one(query))
+            user = users.find_one(query)
+            members.append(
+                {
+                    "email": user["email"],
+                    "firstname": user["firstname"],
+                    "lastname": user["lastname"],
+                    "invoices": user["invoices"],
+                    "hex_color": user["hex_color"],
+                    "team": user["team"],
+                }
+            )
 
         return f"Successfully got list of members in {team_name}", members
 
     for member in team["members"]:
         query = {"email": member["email"]}
         if member["role"] == role:
-            members.append(users.find_one(query))
+            user = users.find_one(query)
+            members.append(
+                {
+                    "email": user["email"],
+                    "firstname": user["firstname"],
+                    "lastname": user["lastname"],
+                    "invoices": user["invoices"],
+                    "hex_color": user["hex_color"],
+                    "team": user["team"],
+                }
+            )
 
     return f"Successfully got list of members in {team_name} with role {role}", members
 

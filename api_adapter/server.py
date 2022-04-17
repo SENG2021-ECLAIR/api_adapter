@@ -241,7 +241,7 @@ def team_members_route():
     response = list_team_members(token, role)
 
     logging.info(response)
-    return response
+    return json.dumps(response)
 
 
 @APP.route("/stats/sent", methods=["GET"])
