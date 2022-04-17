@@ -340,4 +340,4 @@ def form_json(filename: str) -> json:
         "CustomerPost": get_CustomerPost(ubl_dict),
         "CustomerCountry": get_CustomerCountry(ubl_dict),
     }
-    return json.dumps(output)
+    return output
