@@ -28,7 +28,6 @@ from api_adapter.profile import (
 )
 from api_adapter.render import get_render
 from api_adapter.send import send_invoice
-from api_adapter.render_json import form_json
 from api_adapter.team import create_team, invite_member, list_team_members
 from api_adapter.users import list_users
 
@@ -150,10 +149,10 @@ def list_invoices_route():
 @APP.route("/invoice/render", methods=["GET"])
 def render_invoice_route():
     token = request.headers.get("token")
-    address = request.headers.get("ubl_address")
+    address = request.headers.get("invoice_id")
     if token is None or address is None:
         return {"msg": "Needs token and invoice_id in headers"}
-    response = form_json(address)
+    response = get_render(token, address)
     return json.dumps(response)
 
 
@@ -229,6 +228,7 @@ def cleanup_route():
     # FIND A WAY TO REMOVE IN PROD
     users_val, logged_in_val = db_cleanup()
     res = {
-        "msg": f"Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
+        # "msg": f"Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
+        "msg": "Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
     }
     return res
