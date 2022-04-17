@@ -445,6 +445,7 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
                     "lastname": user["lastname"],
                     "invoices": user["invoices"],
                     "hex_color": user["hex_color"],
+                    "role": member["role"],
                     "team": user["team"],
                 }
             )
@@ -462,6 +463,7 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
                     "lastname": user["lastname"],
                     "invoices": user["invoices"],
                     "hex_color": user["hex_color"],
+                    "role": member["role"],
                     "team": user["team"],
                 }
             )
