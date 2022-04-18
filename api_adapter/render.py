@@ -50,3 +50,6 @@ def get_invoice_contents(token, id):
         if invoices["received"][i]["invoice_id"] == id:
             return invoices["received"][i]["content"]
     return None
+
+
+#
