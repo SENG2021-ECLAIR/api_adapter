@@ -2,8 +2,11 @@
 Calculate and create the stats of the users.
 """
 
+import datetime
+
+import xmltodict
+
 from api_adapter.database import get_invoices
-import datetime, xmltodict
 
 
 def last_thirty_days_stats(token):
@@ -15,7 +18,7 @@ def last_thirty_days_stats(token):
 
     list_stats = []
 
-    for _ in range(0,30):
+    for _ in range(0, 30):
         list_stats.append(0)
 
     # find today's date
@@ -28,7 +31,7 @@ def last_thirty_days_stats(token):
 
     i = 0
 
-    while (curr_date != start_date):
+    while curr_date != start_date:
 
         for invoice in invoices["created"]:
             time_of_invoice = invoice["timestamp"]
@@ -38,13 +41,16 @@ def last_thirty_days_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.month == curr_date.month
-               and invoice_datetime.year == curr_date.year
-               and invoice_datetime.day == curr_date.day):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            if (
+                invoice_datetime.month == curr_date.month
+                and invoice_datetime.year == curr_date.year
+                and invoice_datetime.day == curr_date.day
+            ):
+
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_stats[i] += float(monetary["cbc:PayableAmount"]["#text"])
-        
+
         for invoice in invoices["received"]:
             time_of_invoice = invoice["timestamp"]
 
@@ -53,10 +59,12 @@ def last_thirty_days_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.month == curr_date.month
-               and invoice_datetime.year == curr_date.year
-               and invoice_datetime.day == curr_date.day):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            if (
+                invoice_datetime.month == curr_date.month
+                and invoice_datetime.year == curr_date.year
+                and invoice_datetime.day == curr_date.day
+            ):
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_stats[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -64,10 +72,7 @@ def last_thirty_days_stats(token):
         curr_date -= datetime.timedelta(1)
         i += 1
 
-    return {
-        "msg": msg,
-        "last_thirty_days": list_stats
-    }
+    return {"msg": msg, "last_thirty_days": list_stats}
 
 
 def curr_daily_stats(token):
@@ -91,13 +96,15 @@ def curr_daily_stats(token):
         invoice_datetime = datetime.datetime.strptime(
             time_of_invoice, "%d/%m/%Y, %H:%M:%S"
         )
-        if (invoice_datetime.day == today_date.day
+        if (
+            invoice_datetime.day == today_date.day
             and invoice_datetime.month == today_date.month
-            and invoice_datetime.year == today_date.year):
-            inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            and invoice_datetime.year == today_date.year
+        ):
+            inv_dict = xmltodict.parse(invoice["content"])
             monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
             daily_earns += float(monetary["cbc:PayableAmount"]["#text"])
-    
+
     for invoice in invoices["received"]:
         time_of_invoice = invoice["timestamp"]
 
@@ -105,16 +112,18 @@ def curr_daily_stats(token):
         invoice_datetime = datetime.datetime.strptime(
             time_of_invoice, "%d/%m/%Y, %H:%M:%S"
         )
-        if (invoice_datetime.day == today_date.day
+        if (
+            invoice_datetime.day == today_date.day
             and invoice_datetime.month == today_date.month
-            and invoice_datetime.year == today_date.year):
-            inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            and invoice_datetime.year == today_date.year
+        ):
+            inv_dict = xmltodict.parse(invoice["content"])
             monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
             daily_earns += float(monetary["cbc:PayableAmount"]["#text"])
 
     list_prev_days = []
 
-    for _ in range(0,5):
+    for _ in range(0, 5):
         list_prev_days.append(0)
 
     # find the date 5 months ago
@@ -124,8 +133,7 @@ def curr_daily_stats(token):
 
     i = 0
 
-
-    while (curr_date != start_date):
+    while curr_date != start_date:
 
         for invoice in invoices["created"]:
             time_of_invoice = invoice["timestamp"]
@@ -135,10 +143,12 @@ def curr_daily_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.day == curr_date.day
+            if (
+                invoice_datetime.day == curr_date.day
                 and invoice_datetime.month == curr_date.month
-                and invoice_datetime.year == curr_date.year):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+                and invoice_datetime.year == curr_date.year
+            ):
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_prev_days[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -150,10 +160,12 @@ def curr_daily_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.day == curr_date.day
+            if (
+                invoice_datetime.day == curr_date.day
                 and invoice_datetime.month == curr_date.month
-                and invoice_datetime.year == curr_date.year):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+                and invoice_datetime.year == curr_date.year
+            ):
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_prev_days[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -161,11 +173,7 @@ def curr_daily_stats(token):
         curr_date -= datetime.timedelta(1)
         i += 1
 
-    return {
-        "msg": msg,
-        "day_earns": daily_earns,
-        "last_five_days": list_prev_days
-    }
+    return {"msg": msg, "day_earns": daily_earns, "last_five_days": list_prev_days}
 
 
 def curr_month_stats(token):
@@ -189,12 +197,14 @@ def curr_month_stats(token):
         invoice_datetime = datetime.datetime.strptime(
             time_of_invoice, "%d/%m/%Y, %H:%M:%S"
         )
-        if (invoice_datetime.month == today_date.month
-            and invoice_datetime.year == today_date.year):
-            inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+        if (
+            invoice_datetime.month == today_date.month
+            and invoice_datetime.year == today_date.year
+        ):
+            inv_dict = xmltodict.parse(invoice["content"])
             monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
             month_earns += float(monetary["cbc:PayableAmount"]["#text"])
-    
+
     for invoice in invoices["received"]:
         time_of_invoice = invoice["timestamp"]
 
@@ -202,26 +212,27 @@ def curr_month_stats(token):
         invoice_datetime = datetime.datetime.strptime(
             time_of_invoice, "%d/%m/%Y, %H:%M:%S"
         )
-        if (invoice_datetime.month == today_date.month
-            and invoice_datetime.year == today_date.year):
-            inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+        if (
+            invoice_datetime.month == today_date.month
+            and invoice_datetime.year == today_date.year
+        ):
+            inv_dict = xmltodict.parse(invoice["content"])
             monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
             month_earns += float(monetary["cbc:PayableAmount"]["#text"])
 
     list_prev_months = []
 
-    for _ in range(0,5):
+    for _ in range(0, 5):
         list_prev_months.append(0)
 
     # find the date 5 months ago
-    start_date = today_date - datetime.timedelta(5*30)
+    start_date = today_date - datetime.timedelta(5 * 30)
 
     curr_date = today_date
 
     i = 0
 
-
-    while (curr_date != start_date):
+    while curr_date != start_date:
 
         for invoice in invoices["created"]:
             time_of_invoice = invoice["timestamp"]
@@ -231,9 +242,11 @@ def curr_month_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.month == curr_date.month
-                and invoice_datetime.year == curr_date.year):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            if (
+                invoice_datetime.month == curr_date.month
+                and invoice_datetime.year == curr_date.year
+            ):
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_prev_months[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -245,9 +258,11 @@ def curr_month_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.month == curr_date.month
-                and invoice_datetime.year == curr_date.year):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            if (
+                invoice_datetime.month == curr_date.month
+                and invoice_datetime.year == curr_date.year
+            ):
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_prev_months[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -258,7 +273,7 @@ def curr_month_stats(token):
     return {
         "msg": msg,
         "month_earns": month_earns,
-        "last_five_months": list_prev_months
+        "last_five_months": list_prev_months,
     }
 
 
@@ -283,8 +298,8 @@ def curr_year_stats(token):
         invoice_datetime = datetime.datetime.strptime(
             time_of_invoice, "%d/%m/%Y, %H:%M:%S"
         )
-        if (invoice_datetime.year == today_date.year):
-            inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+        if invoice_datetime.year == today_date.year:
+            inv_dict = xmltodict.parse(invoice["content"])
             monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
             year_earns += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -295,24 +310,24 @@ def curr_year_stats(token):
         invoice_datetime = datetime.datetime.strptime(
             time_of_invoice, "%d/%m/%Y, %H:%M:%S"
         )
-        if (invoice_datetime.year == today_date.year):
-            inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+        if invoice_datetime.year == today_date.year:
+            inv_dict = xmltodict.parse(invoice["content"])
             monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
             year_earns += float(monetary["cbc:PayableAmount"]["#text"])
 
     list_prev_years = []
 
-    for _ in range(0,5):
+    for _ in range(0, 5):
         list_prev_years.append(0)
 
     # find the date 5 years ago
-    start_date = today_date - datetime.timedelta(5*365)
+    start_date = today_date - datetime.timedelta(5 * 365)
 
     curr_date = today_date
 
     i = 0
 
-    while (curr_date != start_date):
+    while curr_date != start_date:
 
         for invoice in invoices["created"]:
             time_of_invoice = invoice["timestamp"]
@@ -322,9 +337,11 @@ def curr_year_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.month == curr_date.month
-                and invoice_datetime.year == curr_date.year):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            if (
+                invoice_datetime.month == curr_date.month
+                and invoice_datetime.year == curr_date.year
+            ):
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_prev_years[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -336,8 +353,8 @@ def curr_year_stats(token):
                 time_of_invoice, "%d/%m/%Y, %H:%M:%S"
             )
 
-            if (invoice_datetime.year == curr_date.year):
-                inv_dict = xmltodict.parse(invoice["invoices"]["content"])
+            if invoice_datetime.year == curr_date.year:
+                inv_dict = xmltodict.parse(invoice["content"])
                 monetary = inv_dict["Invoice"]["cac:LegalMonetaryTotal"]
                 list_prev_years[i] += float(monetary["cbc:PayableAmount"]["#text"])
 
@@ -345,11 +362,8 @@ def curr_year_stats(token):
         curr_date -= datetime.timedelta(365)
         i += 1
 
-    return {
-        "msg": msg,
-        "year_earns": year_earns,
-        "last_five_years": list_prev_years
-    }
+    return {"msg": msg, "year_earns": year_earns, "last_five_years": list_prev_years}
+
 
 def num_created_stats(token):
     """
@@ -360,10 +374,8 @@ def num_created_stats(token):
 
     created_invoices = invoices["created"]
 
-    return {
-        "msg": msg,
-        "num_created_inv": len(created_invoices)
-    }
+    return {"msg": msg, "num_created_inv": len(created_invoices)}
+
 
 def num_received_stats(token):
     """
@@ -375,10 +387,7 @@ def num_received_stats(token):
 
     received_invoices = invoices["received"]
 
-    return {
-        "msg": msg,
-        "num_received_inv": len(received_invoices)
-    }
+    return {"msg": msg, "num_received_inv": len(received_invoices)}
 
 
 def num_sent_stats(token):
@@ -396,7 +405,4 @@ def num_sent_stats(token):
         if invoice["sent"]:
             num_sent += 1
 
-    return {
-        "msg": msg,
-        "num_sent_inv": num_sent
-    }
+    return {"msg": msg, "num_sent_inv": num_sent}
