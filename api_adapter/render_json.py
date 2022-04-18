@@ -58,8 +58,8 @@ def conv_xml_format(ubl_string):
         )
         xml_string = xml_string.replace("GST", get_TaxSchemeID(xml_dict))
         xml_string = xml_string.replace(
-            "Ebusiness Software Services Pty Ltd</cbc:RegistrationName>",
-            f"{get_SupplierRegistration(xml_dict)}</cbc:RegistrationName>",
+            "Ebusiness Software Services Pty Ltd",
+            get_SupplierRegistration(xml_dict),
         )
         xml_string = xml_string.replace("100 Business St", get_SupplierStreet(xml_dict))
         xml_string = xml_string.replace("Dulwich Hill", get_SupplierCity(xml_dict))
@@ -71,9 +71,7 @@ def conv_xml_format(ubl_string):
         xml_string = xml_string.replace(
             "Suite 123 Level 45", get_CustomerStreet(xml_dict)
         )
-        xml_string = xml_string.replace(
-            "999 The Crescent", get_CustomerStreet(xml_dict)
-        )
+        xml_string = xml_string.replace("999 The Crescent", "")
         xml_string = xml_string.replace("Homebush West", get_CustomerCity(xml_dict))
         xml_string = xml_string.replace("2140", str(get_CustomerPost(xml_dict)))
         xml_string = xml_string.replace("YY", get_CustomerCountry(xml_dict))
