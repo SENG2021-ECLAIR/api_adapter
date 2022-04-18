@@ -6,6 +6,8 @@ from api_adapter.constants import RENDER_BASE_URL
 from api_adapter.database import get_invoices
 from api_adapter.render_json import conv_xml_format
 
+# import zipfile
+
 
 def save_invoice_locally(invoice_contents):
     directory = "invoices/"
@@ -31,11 +33,19 @@ def get_render(token: str, invoice_id: int) -> dict:
     }
 
     res = requests.post(upload_url, files=file)
+    print(f"\n\nRESPONSE:\n\n{res.json()['file_ids'][0]}\n\n")
 
     if res.ok:
-        download_url = f"{RENDER_BASE_URL}download?file_id={res.json()['file_ids'][0]}&file_type=HTML"
+        download_url = f"{RENDER_BASE_URL}download?file_id={res.json()['file_ids'][0]}&file_type=PDF"
         response = requests.get(download_url)
-        return {"msg": "RENDERED", "html": response.text}
+
+        # writing as zip file
+        # https://edstem.org/au/courses/7693/discussion/807755?comment=1827786
+        report_path = "zip_output4.zip"
+        with open(report_path, "wb") as reportFile:
+            reportFile.write(response.text.encode("utf-8"))
+
+        return {"msg": "RENDERED", "content": response.text}
 
     return {"msg": "Error rendering"}
 
@@ -52,4 +62,13 @@ def get_invoice_contents(token, id):
     return None
 
 
-#
+if __name__ == "__main__":
+    return_value = get_render("79bc4516-face-4716-aa71-14f62a91f785", 323)
+    # print(f"\n\RETURN VALUE:\n\n{return_value}\n\n")
+    # zipObj = zipfile.ZipFile("zip_output1.zip", "w")
+    # with zipfile.ZipFile("zip_output1.zip", "w") as myzip:
+    #     myzip.write(return_value["PDF"])
+
+    # f = open("zip_output.zip", "w")
+    # f.write(return_value["PDF"])
+    # f.close()
