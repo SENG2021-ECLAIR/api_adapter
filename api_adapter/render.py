@@ -6,6 +6,8 @@ from api_adapter.constants import RENDER_BASE_URL
 from api_adapter.database import get_invoices
 from api_adapter.render_json import conv_xml_format
 
+# import zipfile
+
 
 def save_invoice_locally(invoice_contents):
     directory = "invoices/"
@@ -31,11 +33,13 @@ def get_render(token: str, invoice_id: int) -> dict:
     }
 
     res = requests.post(upload_url, files=file)
+    print(f"\n\nRESPONSE:\n\n{res.json()['file_ids'][0]}\n\n")
 
     if res.ok:
         download_url = f"{RENDER_BASE_URL}download?file_id={res.json()['file_ids'][0]}&file_type=HTML"
         response = requests.get(download_url)
-        return {"msg": "RENDERED", "html": response.text}
+
+        return {"msg": "RENDERED", "content": response.text}
 
     return {"msg": "Error rendering"}
 
@@ -50,6 +54,3 @@ def get_invoice_contents(token, id):
         if invoices["received"][i]["invoice_id"] == id:
             return invoices["received"][i]["content"]
     return None
-
-
-#
