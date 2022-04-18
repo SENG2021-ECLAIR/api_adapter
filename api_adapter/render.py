@@ -47,10 +47,7 @@ def get_invoice_contents(token, id):
     invoices, msg = get_invoices(token)
 
     for i in range(0, len(invoices["created"])):
-        print(invoices["created"][i]["invoice_id"])
-        print(id)
         if str(invoices["created"][i]["invoice_id"]) == str(id):
-            print("Found")
             return invoices["created"][i]["content"]
     for i in range(0, len(invoices["received"])):
         if str(invoices["received"][i]["invoice_id"]) == str(id):
