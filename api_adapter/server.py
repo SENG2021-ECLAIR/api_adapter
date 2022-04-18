@@ -38,7 +38,12 @@ from api_adapter.stats import (
     num_received_stats,
     num_sent_stats,
 )
-from api_adapter.team import create_team, invite_member, list_team_members
+from api_adapter.team import (
+    create_team,
+    invite_member,
+    list_team_members,
+    list_team_invoices
+)
 from api_adapter.users import list_users
 
 APP = Flask(__name__)
@@ -240,6 +245,16 @@ def team_members_route():
     role = request.args.get("role")
     response = list_team_members(token, role)
 
+    logging.info(response)
+    return json.dumps(response)
+
+
+@APP.route("team/get_invoices", methods=["GET"])
+def team_invoices_route():
+    token = request.headers.get("token")
+    if not check_logged_in_token(token):
+        return {"msg": "Invalid token"}
+    response = list_team_invoices(token)
     logging.info(response)
     return json.dumps(response)
 
