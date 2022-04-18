@@ -393,7 +393,6 @@ def num_sent_stats(token):
     num_sent = 0
 
     for invoice in created_invoices:
-        print(invoice)
         if invoice["sent"]:
             num_sent += 1
 
