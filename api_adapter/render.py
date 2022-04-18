@@ -33,7 +33,6 @@ def get_render(token: str, invoice_id: int) -> dict:
     }
 
     res = requests.post(upload_url, files=file)
-    print(f"\n\nRESPONSE:\n\n{res.json()['file_ids'][0]}\n\n")
 
     if res.ok:
         download_url = f"{RENDER_BASE_URL}download?file_id={res.json()['file_ids'][0]}&file_type=HTML"
@@ -48,9 +47,12 @@ def get_invoice_contents(token, id):
     invoices, msg = get_invoices(token)
 
     for i in range(0, len(invoices["created"])):
-        if invoices["created"][i]["invoice_id"] == id:
+        print(invoices["created"][i]["invoice_id"])
+        print(id)
+        if str(invoices["created"][i]["invoice_id"]) == str(id):
+            print("Found")
             return invoices["created"][i]["content"]
     for i in range(0, len(invoices["received"])):
-        if invoices["received"][i]["invoice_id"] == id:
+        if str(invoices["received"][i]["invoice_id"]) == str(id):
             return invoices["received"][i]["content"]
     return None
