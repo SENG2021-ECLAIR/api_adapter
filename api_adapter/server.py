@@ -27,7 +27,7 @@ from api_adapter.profile import (
     update_profile_firstname,
     update_profile_lastname,
 )
-from api_adapter.render_json import form_json
+from api_adapter.render import get_render
 from api_adapter.send import send_invoice
 from api_adapter.stats import (
     curr_daily_stats,
@@ -167,13 +167,13 @@ def list_invoices_route():
     return json.dumps(response)
 
 
-@APP.route("/invoice/render", methods=["GET"])
+@APP.route("/invoice/render", methods=["POST"])
 def render_invoice_route():
     token = request.headers.get("token")
-    address = request.headers.get("ubl_address")
+    address = request.headers.get("invoice_id")
     if token is None or address is None:
         return {"msg": "Needs token and invoice_id in headers"}
-    response = form_json(address)
+    response = get_render(token, address)
     logging.info(response)
     return json.dumps(response)
 
@@ -326,6 +326,7 @@ def cleanup_route():
     # FIND A WAY TO REMOVE IN PROD
     users_val, logged_in_val = db_cleanup()
     res = {
-        "msg": f"Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
+        # "msg": f"Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
+        "msg": "Removed #{users_val} entries from users and #{logged_in_val} entries from logged_in."
     }
     return res
