@@ -7,6 +7,7 @@ import datetime
 import xmltodict
 
 from api_adapter.database import get_invoices
+from api_adapter.helpers import get_time
 
 
 def last_thirty_days_stats(token):
@@ -22,7 +23,7 @@ def last_thirty_days_stats(token):
         list_stats.append(0)
 
     # find today's date
-    today_date = datetime.datetime.now()
+    today_date = get_time()
 
     # find the date 30 days ago
     start_date = today_date - datetime.timedelta(30)
@@ -87,7 +88,7 @@ def curr_daily_stats(token):
     daily_earns = 0
 
     # find today's date
-    today_date = datetime.datetime.now()
+    today_date = get_time()
 
     for invoice in created_invoices:
         time_of_invoice = invoice["timestamp"]
@@ -188,7 +189,7 @@ def curr_month_stats(token):
     month_earns = 0
 
     # find today's date
-    today_date = datetime.datetime.now()
+    today_date = get_time()
 
     for invoice in created_invoices:
         time_of_invoice = invoice["timestamp"]
@@ -289,7 +290,7 @@ def curr_year_stats(token):
     year_earns = 0
 
     # find today's date
-    today_date = datetime.datetime.now()
+    today_date = get_time()
 
     for invoice in created_invoices:
         time_of_invoice = invoice["timestamp"]

@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 from pymongo import MongoClient
 
 from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY
-from api_adapter.helpers import generate_token, get_customer_name, get_time
+from api_adapter.helpers import generate_token, get_customer_name, get_time_string
 
 
 def connect_to_db():
@@ -206,7 +206,7 @@ def store_invoice(token: str, invoice: str, method: str) -> str:
     invoice_data = {
         "invoice_id": invoice_id,
         "customer_name": customer_name,
-        "timestamp": get_time(),
+        "timestamp": get_time_string(),
         "size": sys.getsizeof(invoice),
         "content": invoice,
         "method": method,
@@ -369,12 +369,12 @@ def register_team(team_name: str, owner: dict) -> str:
     owner = {
         "email": owner["email"],
         "role": "Owner",
-        "time_joined": get_time(),
+        "time_joined": get_time_string(),
     }
 
     team = {
         "team_name": team_name,
-        "time_created": get_time(),
+        "time_created": get_time_string(),
         "team_owner": owner,
         "members": [],
     }
@@ -406,7 +406,7 @@ def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
     member = {
         "email": user["email"],
         "role": role,
-        "time_joined": get_time(),
+        "time_joined": get_time_string(),
     }
     teams.update_one(query, {"$push": {"members": member}})
 

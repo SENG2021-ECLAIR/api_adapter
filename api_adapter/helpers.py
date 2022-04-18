@@ -35,6 +35,11 @@ def encrypt_password(password):
     return md5(password.encode()).hexdigest()
 
 
-def get_time() -> str:
+def get_time_string() -> str:
     sydney_tz = timezone("Australia/Sydney")
     return datetime.now(sydney_tz).strftime("%d/%m/%Y, %H:%M:%S")
+
+
+def get_time() -> datetime:
+    sydney_tz = timezone("Australia/Sydney")
+    return datetime.now(sydney_tz)
