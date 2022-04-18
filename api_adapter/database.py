@@ -13,9 +13,7 @@ def connect_to_db():
     """
     Connect to db
     """
-    client = MongoClient(
-        f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true"
-    )
+    client = MongoClient(f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority")
     return client[ENVOY]
 
 
