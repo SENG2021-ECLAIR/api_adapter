@@ -26,28 +26,30 @@ def get_render(token: str, invoice_id: int) -> dict:
     upload_url = f"{RENDER_BASE_URL}upload"
 
     file_path = save_invoice_locally(invoice_contents)
-    files = {
+    file = {
         "file": ("invoice.xml", open(file_path, "rb"), "text/xml"),
     }
-    headers = {
-        "Content-Disposition": 'form-data; name="file"; filename="'
-        + "invoice.xml"
-        + '"',
-        "Content-Type": "text/xml",
-    }
-    res = requests.post(upload_url, files=files, headers=headers)
-    print(res.text)
-    """if res.ok:
-        download_url = (
-            f"{RENDER_BASE_URL}download?file_id={res.json()['file_id']}&file_type=HTML"
-        )
-        response = requests.get(download_url)
-        return {"msg": "RENDERED", "html": response.text}"""
+
+    res = requests.post(upload_url, files=file)
+
     if res.ok:
-        return {"msg": "RENDERED", "html": res.text}
+        download_url = f"{RENDER_BASE_URL}download?file_id={res.json()['file_ids'][0]}&file_type=HTML"
+        response = requests.get(download_url)
+        return {"msg": "RENDERED", "html": response.text}
+
     return {"msg": "Error rendering"}
 
 
 def get_invoice_contents(token, id):
     invoices, msg = get_invoices(token)
-    return invoices[id]["content"]
+
+    for i in range(0, len(invoices["created"])):
+        if invoices["created"][i]["invoice_id"] == id:
+            return invoices["created"][i]["content"]
+    for i in range(0, len(invoices["received"])):
+        if invoices["received"][i]["invoice_id"] == id:
+            return invoices["received"][i]["content"]
+    return None
+
+
+#

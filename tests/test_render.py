@@ -1,10 +1,12 @@
 import xmltodict
 
+from api_adapter.database import get_invoices, login_user, register_user, store_invoice
+from api_adapter.render import get_render
 from api_adapter.render_json import conv_xml_format
 
 
 def test_correct_outputs():
-    resp = conv_xml_format("tests/test_data/sample_response.xml")
+    resp = conv_xml_format(open("tests/test_data/sample_response.xml").read())
     resp = xmltodict.parse(resp)
 
     xml_string = open("tests/test_data/sample_response.xml").read()
@@ -238,3 +240,21 @@ def test_correct_outputs():
         ]["cac:Country"]["cbc:IdentificationCode"]["#text"]
         == "NZ"
     )
+
+
+def test_with_database():
+    register_user({"email": "emily@gmail.com", "password": "myDB1234"})
+    token, resp = login_user("emily@gmail.com", "myDB1234")
+    store_invoice(token, open("tests/test_data/sample_response.xml").read(), "created")
+    store_invoice(token, open("tests/test_data/sample_response.xml").read(), "received")
+
+    invoices, resp = get_invoices(token)
+
+    created_id = invoices["created"][0]["invoice_id"]
+    received_id = invoices["received"][0]["invoice_id"]
+
+    created_response = get_render(token, created_id)
+    assert created_response["msg"] == "RENDERED"
+
+    received_response = get_render(token, received_id)
+    assert received_response["msg"] == "RENDERED"

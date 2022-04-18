@@ -7,9 +7,13 @@ MISSING = "ERROR DATA MISSING"
 INVALID = "ERROR INVALID DATA TYPE. EXPECTED: "
 
 
-def conv_xml_to_dict(ubl_file_name):
+def conv_xml_to_dict(ubl_string):
     try:
-        xml_string = open(ubl_file_name).read()
+        return xmltodict.parse(ubl_string)
+    except Exception as e:
+        raise Exception(f"{e}: String not in XML readable format")
+    try:
+        xml_string = open(ubl_string).read()
         return xmltodict.parse(xml_string)
     except FileNotFoundError:
         raise Exception("UBL cannot be found")
@@ -36,7 +40,6 @@ def conv_xml_format(ubl_string):
             "100.00</cbc:LineExtensionAmount>",
             f"{get_Currency(xml_dict)}</cbc:LineExtensionAmount>",
         )
-        print(get_Currency(xml_dict))
         xml_string = xml_string.replace("As agreed", get_PaymentTerms(xml_dict))
         xml_string = xml_string.replace(
             "10.00</cbc:TaxAmount>", f"{get_TaxAmount(xml_dict)}</cbc:TaxAmount>"
