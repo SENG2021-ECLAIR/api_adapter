@@ -246,6 +246,25 @@ def get_invoices(token: str) -> Tuple[list, str]:
     )
 
 
+def get_invoices_email(email: str) -> Tuple[list, str]:
+    db = connect_to_db()
+    email_in_query = {"email": email}
+    users = db["users"]
+    user = users.find_one(email_in_query)
+
+    created = []
+    received = []
+    for invoice in user["invoices"]:
+        if invoice["method"] == "created":
+            created.append(invoice)
+        elif invoice["method"] == "recieved":
+            received.append(invoice)
+    return (
+        {"created": created, "received": received},
+        f"Successfully retreived invoices for {email}",
+    )
+
+
 hex_colors = [
     "#2292A4",
     "#D96C06",
