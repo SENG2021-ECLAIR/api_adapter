@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 from pymongo import MongoClient
 
 from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY
-from api_adapter.helpers import generate_token, get_customer_name, get_time
+from api_adapter.helpers import generate_token, get_customer_name, get_time_string
 
 
 def connect_to_db():
@@ -15,6 +15,16 @@ def connect_to_db():
     """
     client = MongoClient(f"{DB_CLIENT_PREFIX}{ENVOY}?retryWrites=true&w=majority")
     return client[ENVOY]
+
+
+def create_invoice_count():
+    db = connect_to_db()
+    if not db["invoice_id"].find_one():
+        invoice_id = {"invoice_id": 0}
+        db["invoice_id"].insert_one(invoice_id)
+        return "Invoice Id counter added"
+    else:
+        return "Counter exists"
 
 
 def get_user(email: str) -> Optional[dict]:
@@ -191,13 +201,20 @@ def store_invoice(token: str, invoice: str, method: str) -> str:
 
     customer_name = get_customer_name(invoice)
 
+    invoice_id = db["invoice_id"].find_one()["invoice_id"]
+
     invoice_data = {
+        "invoice_id": invoice_id,
         "customer_name": customer_name,
-        "timestamp": get_time(),
+        "timestamp": get_time_string(),
         "size": sys.getsizeof(invoice),
         "content": invoice,
         "method": method,
     }
+
+    db["invoice_id"].update_one(
+        {"invoice_id": invoice_id}, {"$set": {"invoice_id": invoice_id + 1}}
+    )
 
     users.update_one(users_query, {"$push": {"invoices": invoice_data}})
     return f"Successfully created and stored invoice for {logged_in_user['email']}"
@@ -349,20 +366,15 @@ def register_team(team_name: str, owner: dict) -> str:
         logging.error(f"{team_name} is already a registered team")
         return f"{team_name} is already a registered team"
 
-    user = get_user(owner["email"])
-
     owner = {
-        "firstname": user["firstname"],
-        "lastname": user["lastname"],
-        "email": user["email"],
+        "email": owner["email"],
         "role": "Owner",
-        "time_joined": get_time(),
-        "hex_color": user["hex_color"],
+        "time_joined": get_time_string(),
     }
 
     team = {
         "team_name": team_name,
-        "time_created": get_time(),
+        "time_created": get_time_string(),
         "team_owner": owner,
         "members": [],
     }
@@ -392,12 +404,9 @@ def add_user_to_team(team_name: str, invitee_email: str, role: str) -> str:
         return f"{invitee_email} is already in this team"
 
     member = {
-        "firstname": user["firstname"],
-        "lastname": user["lastname"],
         "email": user["email"],
         "role": role,
-        "time_joined": get_time(),
-        "hex_color": user["hex_color"],
+        "time_joined": get_time_string(),
     }
     teams.update_one(query, {"$push": {"members": member}})
 
@@ -422,14 +431,44 @@ def get_members_of(team_name: str, role: str = None) -> Tuple[str, list]:
         logging.error(f"{team_name} does not exist")
         return f"{team_name} does not exist", []
 
-    if role is None:
-        return f"Successfully got list of members in {team_name}", team["members"]
-
+    users = db["users"]
     members = []
+    if role is None:
+
+        for member in team["members"]:
+            query = {"email": member["email"]}
+            user = users.find_one(query)
+            members.append(
+                {
+                    "email": user["email"],
+                    "firstname": user["firstname"],
+                    "lastname": user["lastname"],
+                    "invoices": user["invoices"],
+                    "hex_color": user["hex_color"],
+                    "role": member["role"],
+                    "team": user["team"],
+                    "time_joined": member["time_joined"],
+                }
+            )
+
+        return f"Successfully got list of members in {team_name}", members
 
     for member in team["members"]:
+        query = {"email": member["email"]}
         if member["role"] == role:
-            members.append(member)
+            user = users.find_one(query)
+            members.append(
+                {
+                    "email": user["email"],
+                    "firstname": user["firstname"],
+                    "lastname": user["lastname"],
+                    "invoices": user["invoices"],
+                    "hex_color": user["hex_color"],
+                    "role": member["role"],
+                    "team": user["team"],
+                    "time_joined": member["time_joined"],
+                }
+            )
 
     return f"Successfully got list of members in {team_name} with role {role}", members
 
@@ -454,3 +493,32 @@ def db_cleanup() -> Tuple[int, int]:
         f"Removed {logged_in_data.deleted_count} documents from logged_in collection"
     )
     return users_data.deleted_count, logged_in_data.deleted_count
+
+
+def delete_invoice(token: str, invoice_id: int):
+    """
+    Delete invoice instance by invoice_id
+    """
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    logged_in_query = {"token": token}
+
+    logged_in_user = logged_in.find_one(logged_in_query)
+    if logged_in_user is None:
+        logging.error("Need to login to delete invoice")
+        return ([], "Need to login to delete invoice")
+
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+    user = users.find_one(users_query)
+    _id = user["_id"]
+
+    db.users.update_many(
+        {"_id": _id}, {"$pull": {"invoices": {"invoice_id": invoice_id}}}
+    )
+
+    users = db["users"]
+    users_query = {"email": logged_in_user["email"]}
+    user = users.find_one(users_query)
+
+    return f"Successfully deleted invoice {invoice_id}"
