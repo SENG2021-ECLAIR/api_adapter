@@ -87,16 +87,4 @@ def test_empty_email():
     }
     result = send_invoice(input)
     input_file.close()
-    assert result.status_code == ACCESS_ERROR
-
-
-def test_empty_file():
-    input = {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNDkxMzgyMzYxM2UzYTBjNjU2ZmQ4NiIsImVtYWlsIjoic2VuZzIwMjFlY2xhaXJAZ21haWwuY29tIiwiaWF0IjoxNjQ4OTU2NTQxfQ.MMog2AH6wNo7RRW5M3oy_0WGA4Kl5oj7rv0p6CrpXVw",
-        "invoiceTitle": "UBL Invoice",
-        "mailContent": "Attached below is your UBL Invoice",
-        "recipientEmail": "z5367576@ad.unsw.edu.au",
-        "file": "",
-    }
-    result = send_invoice(input)
-    assert result.status_code == ACCESS_ERROR
+    assert result["response_code"] == UNAVALIABLE
