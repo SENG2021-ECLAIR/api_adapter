@@ -5,7 +5,6 @@ from typing import Optional, Tuple
 
 from pymongo import MongoClient
 
-
 from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY, hex_colors
 from api_adapter.helpers import generate_token, get_customer_name, get_time_string
 
@@ -48,7 +47,8 @@ def get_email_from_token(token: str) -> str:
     if user is None:
         return "Invalid token"
     return user["email"]
-=======
+
+
 def get_user_from_token(token: str) -> dict:
     """
     Given a token return a user
@@ -229,7 +229,7 @@ def store_invoice(
 
     if method == "received":
         invoice_data["received_timestamp"] = received_timestamp
-    
+
     db["invoice_id"].update_one(
         {"invoice_id": invoice_id}, {"$set": {"invoice_id": invoice_id + 1}}
     )
@@ -262,6 +262,7 @@ def get_invoices(token: str) -> Tuple[list, str]:
         {"created": created, "received": received},
         f"Successfully retreived invoices for {logged_in_user['email']}",
     )
+
 
 def get_user_profile_color(email: str) -> str:
     db = connect_to_db()
