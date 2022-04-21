@@ -1,4 +1,6 @@
 from api_adapter.database import (
+    create_invoice_count,
+    delete_invoice,
     get_user,
     login_user,
     logout_user,
@@ -44,7 +46,7 @@ def test_register_user(db):
     response = register_user(test_user_data)
 
     assert users.find_one(query) is not None
-    assert response == f"User {test_user_data['email']} registered"
+    assert response[0] == f"User {test_user_data['email']} registered"
 
     cleanup(db, test_user_data["email"])
 
@@ -212,3 +214,41 @@ def test_store_invoice(db):
     assert len(user["invoices"]) == 2
     assert user["invoices"][1]["content"] == "some other string"
     assert user["invoices"][1]["method"] == "received"
+
+
+def test_delete_invoice(db):
+    users = db["users"]
+    cleanup(db, test_user_data["email"])
+    query = {"email": test_user_data["email"]}
+
+    # Register and login test user
+    _ = register_user(test_user_data)
+    token, _ = login_user(test_user_data["email"], test_user_data["password"])
+
+    user = users.find_one(query)
+    assert user["invoices"] == []
+    invoice_id = db["invoice_id"].find_one()["invoice_id"]
+
+    store_invoice(token, "somestring", "created")
+    user = users.find_one(query)
+    assert len(user["invoices"]) == 1
+    assert user["invoices"][0]["invoice_id"] == invoice_id
+
+    store_invoice(token, "somestring2", "created")
+    user = users.find_one(query)
+    invoice_id_two = user["invoices"][1]["invoice_id"]
+
+    delete_first = delete_invoice(token, invoice_id)
+    user = users.find_one(query)
+    assert delete_first == f"Successfully deleted invoice {invoice_id}"
+    assert len(user["invoices"]) == 1
+
+    delete_second = delete_invoice(token, invoice_id_two)
+    assert delete_second == f"Successfully deleted invoice {invoice_id_two}"
+    user = users.find_one(query)
+    assert len(user["invoices"]) == 0
+
+
+def test_invoice_count(db):
+    cleanup(db, test_user_data["email"])
+    assert create_invoice_count() == "Counter exists"
