@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 from pymongo import MongoClient
 
-from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY
+from api_adapter.constants import DB_CLIENT_PREFIX, ENVOY, hex_colors
 from api_adapter.helpers import generate_token, get_customer_name, get_time_string
 
 
@@ -34,6 +34,19 @@ def get_user(email: str) -> Optional[dict]:
     db = connect_to_db()
     users = db["users"]
     return users.find_one({"email": email})
+
+
+def get_email_from_token(token: str) -> str:
+    """
+    Given a token return that users email
+    """
+    db = connect_to_db()
+    logged_in = db["logged_in"]
+    logged_in_query = {"token": token}
+    user = logged_in.find_one(logged_in_query)
+    if user is None:
+        return "Invalid token"
+    return user["email"]
 
 
 def get_user_from_token(token: str) -> dict:
@@ -186,7 +199,9 @@ def logout_user(email: str, token: str) -> str:
     return f"Successfully logged out {email}"
 
 
-def store_invoice(token: str, invoice: str, method: str) -> str:
+def store_invoice(
+    token: str, invoice: str, method: str, received_timestamp: str = ""
+) -> str:
     db = connect_to_db()
     logged_in = db["logged_in"]
     logged_in_query = {"token": token}
@@ -212,12 +227,15 @@ def store_invoice(token: str, invoice: str, method: str) -> str:
         "method": method,
     }
 
+    if method == "received":
+        invoice_data["received_timestamp"] = received_timestamp
+
     db["invoice_id"].update_one(
         {"invoice_id": invoice_id}, {"$set": {"invoice_id": invoice_id + 1}}
     )
 
     users.update_one(users_query, {"$push": {"invoices": invoice_data}})
-    return f"Successfully created and stored invoice for {logged_in_user['email']}"
+    return f"Successfully stored invoice for {logged_in_user['email']}"
 
 
 def get_invoices(token: str) -> Tuple[list, str]:
@@ -244,23 +262,6 @@ def get_invoices(token: str) -> Tuple[list, str]:
         {"created": created, "received": received},
         f"Successfully retreived invoices for {logged_in_user['email']}",
     )
-
-
-hex_colors = [
-    "#2292A4",
-    "#D96C06",
-    "#BDBF09",
-    "#613DC1",
-    "#9B5094",
-    "#BB4430",
-    "#645DD7",
-    "#054A91",
-    "#447604",
-    "#0CA4A5",
-    "#EDB230",
-    "#EE2E31",
-    "#D8F793",
-]
 
 
 def get_user_profile_color(email: str) -> str:
